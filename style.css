@@ -5,47 +5,46 @@
 }
 
 body {
-    font-family: 'Cairo', 'Noto Naskh Arabic', sans-serif;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 30%, #0a0a1a 70%, #000000 100%);
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a05 30%, #0a0510 70%, #000000 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 15px;
     direction: rtl;
 }
 
 .container {
-    max-width: 600px;
+    max-width: 500px;
     width: 100%;
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 215, 0, 0.15);
+    border: 1px solid rgba(212, 168, 67, 0.15);
     border-radius: 25px;
-    padding: 30px;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 215, 0, 0.05);
+    padding: 25px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
 }
 
 header {
     text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(212, 168, 67, 0.1);
 }
 
 header h1 {
-    font-family: 'Amiri', 'Noto Naskh Arabic', serif;
-    font-size: 2.4em;
-    color: #ffd700;
-    text-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
-    margin-bottom: 8px;
-    letter-spacing: 2px;
+    font-family: 'Amiri', serif;
+    font-size: 2em;
+    color: #d4a843;
+    text-shadow: 0 0 30px rgba(212, 168, 67, 0.15);
+    margin-bottom: 5px;
 }
 
 .subtitle {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.85em;
     font-family: 'Amiri', serif;
 }
 
@@ -53,53 +52,36 @@ header h1 {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 215, 0, 0.1);
-    border-radius: 20px;
-    padding: 35px 25px;
-    margin-bottom: 25px;
-    min-height: 220px;
+    border: 1px solid rgba(212, 168, 67, 0.1);
+    border-radius: 18px;
+    padding: 30px 20px;
+    margin-bottom: 20px;
+    min-height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    transition: all 0.5s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.quote-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at center, rgba(255, 215, 0, 0.02) 0%, transparent 70%);
-    pointer-events: none;
+    transition: all 0.3s ease;
 }
 
 .quote-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-    border-color: rgba(255, 215, 0, 0.2);
+    border-color: rgba(212, 168, 67, 0.2);
 }
 
 .quote-text {
-    font-family: 'Amiri', 'Noto Naskh Arabic', serif;
-    font-size: 1.6em;
+    font-family: 'Amiri', serif;
+    font-size: 1.5em;
     color: #f5f0e8;
     text-align: center;
     line-height: 2;
     margin-bottom: 15px;
-    position: relative;
-    z-index: 1;
+    width: 100%;
 }
 
 .quote-mark {
-    color: #ffd700;
-    font-size: 1.3em;
-    opacity: 0.5;
-    font-family: 'Amiri', serif;
+    color: #d4a843;
+    font-size: 1.2em;
+    opacity: 0.4;
 }
 
 .quote-category {
@@ -110,48 +92,46 @@ header h1 {
     border-radius: 20px;
     margin-top: 10px;
     border: 1px solid rgba(212, 168, 67, 0.15);
-    font-family: 'Cairo', sans-serif;
 }
 
 .quote-number {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.25);
     font-size: 0.7em;
     margin-top: 10px;
-    font-family: 'Cairo', sans-serif;
 }
 
 .controls {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .btn {
-    padding: 12px 22px;
+    padding: 10px 16px;
     border: none;
     border-radius: 12px;
     font-family: 'Cairo', sans-serif;
-    font-size: 0.85em;
+    font-size: 0.8em;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    letter-spacing: 0.5px;
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
 }
 
 .btn-primary {
-    background: rgba(255, 215, 0, 0.12);
-    color: #ffd700;
-    border: 1px solid rgba(255, 215, 0, 0.2);
+    background: rgba(212, 168, 67, 0.12);
+    color: #d4a843;
+    border: 1px solid rgba(212, 168, 67, 0.2);
 }
 
 .btn-primary:hover {
-    background: rgba(255, 215, 0, 0.2);
-    transform: scale(1.03);
-    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.1);
+    background: rgba(212, 168, 67, 0.2);
 }
 
 .btn-success {
@@ -162,7 +142,6 @@ header h1 {
 
 .btn-success:hover {
     background: rgba(76, 175, 80, 0.18);
-    transform: scale(1.03);
 }
 
 .btn-info {
@@ -173,7 +152,6 @@ header h1 {
 
 .btn-info:hover {
     background: rgba(33, 150, 243, 0.18);
-    transform: scale(1.03);
 }
 
 .btn-secondary {
@@ -184,7 +162,6 @@ header h1 {
 
 .btn-secondary:hover {
     background: rgba(158, 158, 158, 0.18);
-    transform: scale(1.03);
 }
 
 .navigation {
@@ -198,24 +175,22 @@ header h1 {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #ccc;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 10px;
     cursor: pointer;
     font-family: 'Cairo', sans-serif;
-    font-size: 0.85em;
+    font-size: 0.8em;
     transition: all 0.3s ease;
 }
 
 .nav-btn:hover {
     background: rgba(255, 255, 255, 0.12);
-    transform: scale(1.03);
     color: #fff;
 }
 
 #counter {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.85em;
-    font-family: 'Cairo', sans-serif;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.8em;
 }
 
 /* النوافذ المنبثقة */
@@ -226,13 +201,13 @@ header h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     z-index: 1000;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 15px;
 }
 
 .modal.active {
@@ -240,80 +215,77 @@ header h1 {
 }
 
 .modal-content {
-    background: rgba(15, 10, 5, 0.95);
+    background: rgba(15, 10, 5, 0.97);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 215, 0, 0.12);
+    border: 1px solid rgba(212, 168, 67, 0.12);
     border-radius: 22px;
-    padding: 30px;
-    max-width: 600px;
+    padding: 25px;
+    max-width: 500px;
     width: 100%;
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
     position: relative;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
 }
 
 .close-btn {
     position: absolute;
-    top: 15px;
-    left: 20px;
+    top: 12px;
+    left: 18px;
     font-size: 1.8em;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.35);
     cursor: pointer;
     transition: all 0.3s ease;
-    font-family: 'Cairo', sans-serif;
+    line-height: 1;
 }
 
 .close-btn:hover {
-    color: #ffd700;
-    transform: rotate(90deg);
+    color: #d4a843;
 }
 
 .modal-content h2 {
-    color: #ffd700;
+    color: #d4a843;
     font-family: 'Amiri', serif;
-    font-size: 1.8em;
+    font-size: 1.6em;
     text-align: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(212, 168, 67, 0.1);
 }
 
 /* صفحة حول الموقع */
 .about-section {
-    margin-bottom: 20px;
-    padding: 18px;
+    margin-bottom: 18px;
+    padding: 15px;
     background: rgba(255, 255, 255, 0.03);
-    border-radius: 15px;
-    border: 1px solid rgba(255, 215, 0, 0.06);
+    border-radius: 14px;
+    border: 1px solid rgba(212, 168, 67, 0.06);
 }
 
 .about-section h3 {
     color: #d4a843;
-    font-size: 1.05em;
-    margin-bottom: 10px;
+    font-size: 1em;
+    margin-bottom: 8px;
     font-family: 'Amiri', serif;
 }
 
 .about-section p {
-    color: rgba(255, 255, 255, 0.75);
-    line-height: 1.8;
-    font-size: 0.95em;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.7;
+    font-size: 0.9em;
 }
 
 .developer-name {
     font-family: 'Amiri', serif;
-    font-size: 1.4em !important;
+    font-size: 1.3em !important;
     color: #f5f0e8 !important;
     text-align: center;
-    margin-top: 5px;
 }
 
 .social-links {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .social-link {
@@ -325,7 +297,7 @@ header h1 {
     font-weight: 500;
     transition: all 0.3s ease;
     text-align: center;
-    font-size: 0.9em;
+    font-size: 0.85em;
 }
 
 .social-link.telegram {
@@ -349,9 +321,9 @@ header h1 {
 }
 
 .dedication-list li {
-    color: rgba(255, 255, 255, 0.7);
-    padding: 6px 0;
-    font-size: 1em;
+    color: rgba(255, 255, 255, 0.65);
+    padding: 5px 0;
+    font-size: 0.95em;
     font-family: 'Amiri', serif;
 }
 
@@ -363,43 +335,41 @@ header h1 {
 .dedication-text {
     color: #d4a843 !important;
     font-style: italic;
-    margin-top: 12px;
+    margin-top: 10px;
     text-align: center;
-    font-size: 0.9em !important;
+    font-size: 0.85em !important;
 }
 
 /* البحث */
 #searchInput {
     width: 100%;
-    padding: 12px 18px;
-    border: 1px solid rgba(255, 215, 0, 0.15);
+    padding: 12px 16px;
+    border: 1px solid rgba(212, 168, 67, 0.15);
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.04);
     color: #f5f0e8;
     font-family: 'Cairo', sans-serif;
-    font-size: 0.95em;
-    margin-bottom: 18px;
+    font-size: 0.9em;
+    margin-bottom: 15px;
     outline: none;
-    transition: all 0.3s ease;
 }
 
 #searchInput:focus {
     border-color: #d4a843;
-    box-shadow: 0 0 15px rgba(212, 168, 67, 0.1);
 }
 
 #searchInput::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.25);
 }
 
 #quotesList {
-    max-height: 400px;
+    max-height: 350px;
     overflow-y: auto;
 }
 
 .quote-item {
-    padding: 14px 16px;
-    margin-bottom: 8px;
+    padding: 12px 14px;
+    margin-bottom: 6px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 10px;
     cursor: pointer;
@@ -415,36 +385,36 @@ header h1 {
 .quote-item .q-text {
     color: #f5f0e8;
     font-family: 'Amiri', serif;
-    font-size: 1.1em;
+    font-size: 1em;
     line-height: 1.6;
 }
 
 .quote-item .q-category {
     color: #d4a843;
-    font-size: 0.75em;
-    margin-top: 6px;
-    font-family: 'Cairo', sans-serif;
+    font-size: 0.7em;
+    margin-top: 5px;
 }
 
 /* Toast */
 .toast {
     position: fixed;
-    bottom: 30px;
+    bottom: 25px;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: rgba(10, 8, 5, 0.9);
+    background: rgba(10, 8, 5, 0.92);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     color: #f5f0e8;
-    padding: 14px 28px;
+    padding: 12px 24px;
     border-radius: 12px;
     font-family: 'Cairo', sans-serif;
-    font-size: 0.85em;
+    font-size: 0.8em;
     z-index: 2000;
     opacity: 0;
     transition: all 0.5s ease;
-    border: 1px solid rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(212, 168, 67, 0.1);
     text-align: center;
+    white-space: nowrap;
 }
 
 .toast.show {
@@ -454,7 +424,7 @@ header h1 {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-    width: 6px;
+    width: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -467,18 +437,24 @@ header h1 {
     border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(212, 168, 67, 0.35);
-}
-
-/* Responsive */
+/* تحسينات للهاتف */
 @media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    
     .container {
-        padding: 20px;
+        padding: 18px;
+        border-radius: 20px;
     }
     
     header h1 {
-        font-size: 1.8em;
+        font-size: 1.6em;
+    }
+    
+    .quote-card {
+        padding: 25px 15px;
+        min-height: 170px;
     }
     
     .quote-text {
@@ -486,16 +462,38 @@ header h1 {
     }
     
     .controls {
-        flex-direction: column;
+        gap: 6px;
     }
     
     .btn {
-        width: 100%;
-        padding: 14px;
+        padding: 10px 12px;
+        font-size: 0.75em;
+        min-width: 70px;
     }
     
     .nav-btn {
-        padding: 10px 15px;
-        font-size: 0.8em;
+        padding: 8px 12px;
+        font-size: 0.75em;
+    }
+    
+    .modal-content {
+        padding: 20px;
+        border-radius: 18px;
+    }
+}
+
+@media (max-width: 360px) {
+    .container {
+        padding: 12px;
+    }
+    
+    .quote-text {
+        font-size: 1.1em;
+    }
+    
+    .btn {
+        font-size: 0.7em;
+        padding: 8px 10px;
+        min-width: 60px;
     }
 }
