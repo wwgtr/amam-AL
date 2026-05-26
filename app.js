@@ -1,33 +1,14 @@
 let currentIndex = 0;
 let quotes = [];
 
-// تحميل الأقوال
+// تحميل الأقوال عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
     quotes = window.quotesData || [];
     if (quotes.length > 0) {
         showQuote(0);
         updateCounter();
-    }
-    
-    // تشغيل الجسيمات
-    if (typeof particlesJS !== 'undefined') {
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 80, density: { enable: true, value_area: 800 } },
-                color: { value: '#ffd700' },
-                shape: { type: 'circle' },
-                opacity: { value: 0.3, random: true },
-                size: { value: 3, random: true },
-                line_linked: { enable: true, distance: 150, color: '#ffd700', opacity: 0.1, width: 1 },
-                move: { enable: true, speed: 2, direction: 'none', random: true, straight: false, out_mode: 'out' }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' }, resize: true },
-                modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
-            },
-            retina_detect: true
-        });
+    } else {
+        document.getElementById('quoteContent').textContent = 'لا توجد أقوال متاحة';
     }
 });
 
@@ -37,19 +18,10 @@ function showQuote(index) {
     currentIndex = (index + quotes.length) % quotes.length;
     const quote = quotes[currentIndex];
     
-    const card = document.getElementById('quoteCard');
-    card.style.transform = 'rotateY(90deg)';
-    card.style.opacity = '0';
-    
-    setTimeout(() => {
-        document.getElementById('quoteContent').textContent = quote.text;
-        document.getElementById('quoteCategory').textContent = `📂 ${quote.category}`;
-        document.getElementById('quoteNumber').textContent = `#${currentIndex + 1}`;
-        
-        card.style.transform = 'rotateY(0deg)';
-        card.style.opacity = '1';
-        updateCounter();
-    }, 300);
+    document.getElementById('quoteContent').textContent = quote.text;
+    document.getElementById('quoteCategory').textContent = `📂 ${quote.category}`;
+    document.getElementById('quoteNumber').textContent = `#${currentIndex + 1}`;
+    updateCounter();
 }
 
 // تحديث العداد
@@ -61,7 +33,7 @@ function updateCounter() {
 document.getElementById('shuffleBtn').addEventListener('click', function() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
     showQuote(randomIndex);
-    showToast('🔄 تم اختيار قول عشوائي');
+    showToast(' تم اختيار قول عشوائي');
 });
 
 document.getElementById('prevBtn').addEventListener('click', function() {
@@ -279,7 +251,7 @@ document.getElementById('saveBtn').addEventListener('click', function() {
     link.href = canvas.toDataURL('image/png');
     link.click();
     
-    showToast('✅ تم حفظ الصورة بدقة عالية');
+    showToast(' تم حفظ الصورة بدقة عالية');
 });
 
 // Toast
@@ -300,7 +272,7 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
     this.lineTo(x + w, y + h - r);
     this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
     this.lineTo(x + r, y + h);
-    this.quadraticCurveTo(x, y + h, x, y + h - r);
+    this.quadraticCurveTo(x, y + h, x, y + r);
     this.lineTo(x, y + r);
     this.quadraticCurveTo(x, y, x + r, y);
     return this;
