@@ -9,6 +9,9 @@
 </head>
 <body>
 
+    <!-- خلفية الجسيمات -->
+    <canvas id="particlesCanvas"></canvas>
+
     <div class="container">
         <header>
             <h1>أقوال الإمام علي</h1>
@@ -21,8 +24,6 @@
                 <span id="quoteContent">جارٍ التحميل...</span>
                 <span class="quote-mark">&#xFD3E;</span>
             </div>
-            <div class="quote-category" id="quoteCategory"></div>
-            <div class="quote-number" id="quoteNumber"></div>
         </div>
 
         <div class="controls">
@@ -34,7 +35,6 @@
 
         <div class="navigation">
             <button id="prevBtn" class="nav-btn">السابق</button>
-            <span id="counter">1 / 10</span>
             <button id="nextBtn" class="nav-btn">التالي</button>
         </div>
     </div>
@@ -93,7 +93,6 @@
     <!-- Toast -->
     <div id="toast" class="toast"></div>
 
-    <!-- ترتيب تحميل الملفات مهم جداً: أولاً البيانات ثم التطبيق -->
     <script src="quotes.js"></script>
     <script src="app.js"></script>
 </body>
