@@ -2,87 +2,192 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>أقوال الإمام علي بن أبي طالب ع</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>أقوال الإمام علي عليه السلام</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
 <body>
 
-  <!-- خلفية جسيمات -->
-  <div class="particles" id="particles"></div>
+  <!-- خلفية الجسيمات -->
+  <canvas id="particles"></canvas>
 
-  <!-- الهيدر -->
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="header-icon">☪</div>
-      <h1 class="site-title">أقوال الإمام علي بن أبي طالب</h1>
-      <p class="site-subtitle">عليه السلام</p>
-    </div>
-  </header>
+  <!-- الصفحة الرئيسية -->
+  <div id="page-home" class="page active">
 
-  <!-- المحتوى الرئيسي -->
-  <main class="main-content">
+    <!-- الهيدر -->
+    <header class="glass-header">
+      <div class="header-inner">
+        <h1 class="site-title">أقوال الإمام علي</h1>
+        <p class="site-subtitle">عليه السلام</p>
+      </div>
+      <nav class="nav-buttons">
+        <button class="nav-btn" onclick="showPage('page-all')">
+          <i class="fa fa-list"></i>
+          <span>جميع الأقوال</span>
+        </button>
+        <button class="nav-btn" onclick="showPage('page-about')">
+          <i class="fa fa-info-circle"></i>
+          <span>حول</span>
+        </button>
+      </nav>
+    </header>
 
-    <!-- بطاقة القول -->
-    <div class="quote-wrapper">
-      <div class="quote-card" id="quoteCard">
-        <div class="quote-decoration top-decoration">❝</div>
-        <p class="quote-text" id="quoteText">
-          جاري تحميل القول...
-        </p>
-        <div class="quote-decoration bottom-decoration">❞</div>
-        <div class="quote-divider"></div>
-        <div class="quote-author">
-          <span class="author-icon">🌙</span>
-          <span>الإمام علي بن أبي طالب عليه السلام</span>
+    <!-- البطاقة الرئيسية -->
+    <main class="main-content">
+      <div class="quote-wrapper">
+
+        <!-- عداد -->
+        <div class="counter-bar">
+          <span id="quote-counter">1 / 500</span>
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
         </div>
+
+        <!-- بطاقة القول -->
+        <div class="quote-card glass-card" id="quote-card">
+          <div class="quote-icon-top">"</div>
+          <p class="quote-text" id="quote-text">قِيمَةُ كُلِّ امْرِئٍ مَا يُحْسِنُهُ.</p>
+          <div class="quote-icon-bottom">"</div>
+          <div class="quote-source">— الإمام علي بن أبي طالب عليه السلام</div>
+        </div>
+
+        <!-- أزرار التحكم -->
+        <div class="controls">
+          <button class="ctrl-btn glass-btn" id="btn-prev" onclick="prevQuote()">
+            <i class="fa fa-chevron-right"></i>
+          </button>
+          <button class="ctrl-btn glass-btn main-btn" onclick="randomQuote()">
+            <i class="fa fa-shuffle"></i>
+            <span>عشوائي</span>
+          </button>
+          <button class="ctrl-btn glass-btn" id="btn-next" onclick="nextQuote()">
+            <i class="fa fa-chevron-left"></i>
+          </button>
+        </div>
+
+        <!-- أزرار الإجراءات -->
+        <div class="action-buttons">
+          <button class="action-btn glass-btn" onclick="copyQuote()" title="نسخ">
+            <i class="fa fa-copy"></i>
+            <span>نسخ</span>
+          </button>
+          <button class="action-btn glass-btn save-btn" onclick="saveAsImage()" title="حفظ كصورة ستوري">
+            <i class="fa fa-download"></i>
+            <span>حفظ ستوري</span>
+          </button>
+          <button class="action-btn glass-btn" onclick="shareQuote()" title="مشاركة">
+            <i class="fa fa-share-alt"></i>
+            <span>مشاركة</span>
+          </button>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- تذييل -->
+    <footer class="glass-footer">
+      <p>إهداء لأرواح <strong>ياسين مطر</strong> و <strong>كامل مطر</strong> و <strong>مهند حسن</strong></p>
+    </footer>
+
+  </div>
+
+  <!-- صفحة جميع الأقوال -->
+  <div id="page-all" class="page">
+    <div class="page-header glass-header">
+      <button class="back-btn" onclick="showPage('page-home')">
+        <i class="fa fa-arrow-right"></i> رجوع
+      </button>
+      <h2>جميع أقوال الإمام علي</h2>
+      <div class="search-box">
+        <i class="fa fa-search"></i>
+        <input type="text" id="search-input" placeholder="ابحث في الأقوال..." oninput="searchQuotes()" />
       </div>
     </div>
+    <div class="all-quotes-grid" id="all-quotes-grid"></div>
+  </div>
 
-    <!-- أزرار التحكم -->
-    <div class="controls">
-      <button class="btn btn-prev" id="prevBtn" title="السابق">
-        <span class="btn-icon">→</span>
-        <span class="btn-label">السابق</span>
+  <!-- صفحة حول -->
+  <div id="page-about" class="page">
+    <div class="page-header glass-header">
+      <button class="back-btn" onclick="showPage('page-home')">
+        <i class="fa fa-arrow-right"></i> رجوع
       </button>
-
-      <button class="btn btn-random" id="randomBtn" title="عشوائي">
-        <span class="btn-icon">⟳</span>
-        <span class="btn-label">عشوائي</span>
-      </button>
-
-      <button class="btn btn-next" id="nextBtn" title="التالي">
-        <span class="btn-label">التالي</span>
-        <span class="btn-icon">←</span>
-      </button>
+      <h2>حول الموقع</h2>
     </div>
+    <div class="about-content">
 
-    <!-- عداد الأقوال -->
-    <div class="quote-counter">
-      <span id="currentNum">1</span>
-      <span class="counter-sep">/</span>
-      <span id="totalNum">0</span>
+      <div class="about-card glass-card">
+        <div class="about-avatar">
+          <div class="avatar-ring">
+            <span class="avatar-letter">ع</span>
+          </div>
+        </div>
+        <h3>أقوال الإمام علي عليه السلام</h3>
+        <p class="about-desc">
+          موقع يجمع أقوال وحكم أمير المؤمنين الإمام علي بن أبي طالب عليه السلام،
+          المستمدة من نهج البلاغة وكتب الحكمة الموثقة، لتكون نبراساً ودليلاً في الحياة.
+        </p>
+      </div>
+
+      <div class="about-card glass-card dedication-card">
+        <h3>إهداء</h3>
+        <p>هذا الموقع إهداء خالص لأرواح</p>
+        <div class="names-list">
+          <span class="name-badge">ياسين مطر</span>
+          <span class="name-badge">كامل مطر</span>
+          <span class="name-badge">مهند حسن</span>
+        </div>
+        <p class="rip">رحمهم الله وأسكنهم فسيح جناته</p>
+      </div>
+
+      <div class="about-card glass-card social-card">
+        <h3>تواصل معنا</h3>
+        <div class="social-links">
+          <a href="https://t.me/WWGTR" target="_blank" class="social-link telegram">
+            <i class="fa-brands fa-telegram"></i>
+            <div>
+              <span class="social-label">تيليجرام</span>
+              <span class="social-handle">@WWGTR</span>
+            </div>
+          </a>
+          <a href="https://instagram.com/NE_7U" target="_blank" class="social-link instagram">
+            <i class="fa-brands fa-instagram"></i>
+            <div>
+              <span class="social-label">انستجرام</span>
+              <span class="social-handle">@NE_7U</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="about-card glass-card stats-card">
+        <h3>إحصائيات</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-num" id="total-quotes">0</span>
+            <span class="stat-label">قول وحكمة</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">1</span>
+            <span class="stat-label">مصدر موثق</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">14</span>
+            <span class="stat-label">قرناً من الحكمة</span>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
 
-    <!-- شريط التقدم -->
-    <div class="progress-bar-wrap">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
+  <!-- Toast إشعار -->
+  <div class="toast" id="toast"></div>
 
-    <!-- زر النسخ -->
-    <div class="copy-wrap">
-      <button class="btn-copy" id="copyBtn">
-        📋 نسخ القول
-      </button>
-      <span class="copy-msg" id="copyMsg">تم النسخ!</span>
-    </div>
-
-  </main>
-
-  <!-- الفوتر -->
-  <footer class="site-footer">
-    <p>﴿ وَمَا أُوتِيتُم مِّن الْعِلْمِ إِلَّا قَلِيلًا ﴾</p>
-  </footer>
+  <!-- Canvas لحفظ الصورة (مخفي) -->
+  <canvas id="save-canvas" style="display:none"></canvas>
 
   <script src="quotes.js"></script>
   <script src="app.js"></script>
