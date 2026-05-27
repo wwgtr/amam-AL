@@ -504,7 +504,7 @@
         if (!format.transparent) {
             var sigSize = Math.floor(canvas.width * 0.02);
             ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font=sigSize+'px "Amiri", serif';
-            ctx.fillText('— @ne_7u —', canvas.width/2, canvas.height-padding);
+            ctx.fillText('— ne_7u —', canvas.width/2, canvas.height-padding);
         }
     }
     
