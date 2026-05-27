@@ -128,6 +128,8 @@
         .btn-secondary:hover { background: rgba(158,158,158,0.18); transform: scale(1.02); }
         .btn-settings { background: rgba(255,255,255,0.05); color: #aaa; border: 1px solid rgba(255,255,255,0.1); }
         .btn-settings:hover { background: rgba(255,255,255,0.1); transform: scale(1.02); }
+        .btn-share { background: rgba(33,150,243,0.1); color: #64b5f6; border: 1px solid rgba(33,150,243,0.2); }
+        .btn-share:hover { background: rgba(33,150,243,0.18); transform: scale(1.02); }
         .navigation {
             display: flex;
             justify-content: center;
@@ -276,7 +278,6 @@
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         
-        /* الإعدادات */
         .settings-group { margin-bottom: 20px; }
         .settings-group label { display: block; color: #d4a843; font-size: 0.9em; margin-bottom: 8px; }
         .settings-group select, .settings-group input[type="range"] {
@@ -322,6 +323,32 @@
         }
         .toggle-switch .toggle-track.active::after { left: 27px; }
         
+        /* خيارات الخلفية */
+        .bg-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .bg-option {
+            padding: 15px 10px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.75em;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        .bg-option:hover { transform: scale(1.05); }
+        .bg-option.selected { border-color: #d4a843; box-shadow: 0 0 15px rgba(212,168,67,0.3); }
+        .bg-option .bg-preview {
+            width: 100%;
+            height: 40px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+        
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: rgba(212,168,67,0.2); border-radius: 10px; }
@@ -335,11 +362,13 @@
             .controls { gap: 6px; }
             .btn { padding: 10px 12px; font-size: 0.75em; min-width: 70px; }
             .nav-btn { padding: 10px 15px; font-size: 0.8em; }
+            .bg-options { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 360px) {
             .container { padding: 12px; }
             .quote-text { font-size: 1.1em; }
             .btn { font-size: 0.7em; padding: 8px 10px; min-width: 60px; }
+            .bg-options { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -360,8 +389,9 @@
         <div class="controls">
             <button id="shuffleBtn" class="btn btn-primary">قول عشوائي</button>
             <button id="saveBtn" class="btn btn-success">حفظ كصورة</button>
+            <button id="shareBtn" class="btn btn-share">مشاركة</button>
             <button id="allQuotesBtn" class="btn btn-info">جميع الأقوال</button>
-            <button id="aboutBtn" class="btn btn-secondary">حول الموقع</button>
+            <button id="aboutBtn" class="btn btn-secondary">حول</button>
             <button id="settingsBtn" class="btn btn-settings">⚙️</button>
         </div>
         <div class="navigation">
@@ -385,7 +415,7 @@
             <h2>حول الموقع</h2>
             <div class="about-section">
                 <h3>الهدف من الموقع</h3>
-                <p>موقع متخصص في نشر حكم وأقوال الإمام علي بن أبي طالب (عليه السلام)، يهدف إلى إحياء التراث الإسلامي وتقديم الحكمة العلوية .</p>
+                <p>موقع متخصص في نشر حكم وأقوال الإمام علي بن أبي طالب (عليه السلام)، يهدف إلى إحياء التراث الإسلامي وتقديم الحكمة العلوية بأسلوب عصري وجذاب.</p>
             </div>
             <div class="about-section">
                 <h3>إنشاء وتطوير</h3>
@@ -434,6 +464,13 @@
             </div>
             
             <div class="settings-group">
+                <label>اختر خلفية الصورة</label>
+                <div class="bg-options" id="bgOptions">
+                    <!-- سيتم إنشاؤها بواسطة JavaScript -->
+                </div>
+            </div>
+            
+            <div class="settings-group">
                 <div class="toggle-switch" id="darkModeToggle">
                     <span>الوضع الداكن</span>
                     <div class="toggle-track" id="darkModeTrack"></div>
@@ -445,6 +482,17 @@
                     <span>إخفاء كل شيء عدا الشرار والقول</span>
                     <div class="toggle-track" id="minimalModeTrack"></div>
                 </div>
+            </div>
+            
+            <div class="settings-group">
+                <label>مؤقت تلقائي (ثواني)</label>
+                <select id="timerSelect">
+                    <option value="0">إيقاف</option>
+                    <option value="5">5 ثواني</option>
+                    <option value="10">10 ثواني</option>
+                    <option value="30">30 ثانية</option>
+                    <option value="60">دقيقة</option>
+                </select>
             </div>
         </div>
     </div>
