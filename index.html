@@ -323,22 +323,50 @@
         }
         .toggle-switch .toggle-track.active::after { left: 27px; }
         
-        /* نافذة اختيار الخلفية للحفظ */
+        /* نافذة اختيار التحميل */
         .save-modal-content {
             max-width: 600px !important;
         }
+        .save-section-title {
+            color: #d4a843;
+            font-size: 0.95em;
+            margin: 15px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(212,168,67,0.1);
+        }
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .size-item {
+            padding: 12px 8px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.03);
+        }
+        .size-item:hover { background: rgba(255,255,255,0.06); transform: scale(1.03); }
+        .size-item.selected { border-color: #d4a843; background: rgba(212,168,67,0.08); }
+        .size-item .size-name { color: #f5f0e8; font-size: 0.75em; font-weight: 600; }
+        .size-item .size-dims { color: rgba(255,255,255,0.4); font-size: 0.65em; margin-top: 3px; }
+        .size-item .size-icon { font-size: 1.2em; margin-bottom: 4px; }
+        
         .bg-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-            max-height: 400px;
+            gap: 8px;
+            margin-bottom: 15px;
+            max-height: 300px;
             overflow-y: auto;
             padding: 5px;
         }
         .bg-grid-item {
-            padding: 10px;
-            border-radius: 12px;
+            padding: 8px;
+            border-radius: 10px;
             border: 2px solid transparent;
             cursor: pointer;
             text-align: center;
@@ -348,13 +376,13 @@
         .bg-grid-item.selected { border-color: #d4a843; box-shadow: 0 0 15px rgba(212,168,67,0.3); }
         .bg-grid-item .preview {
             width: 100%;
-            height: 50px;
-            border-radius: 8px;
-            margin-bottom: 5px;
+            height: 40px;
+            border-radius: 6px;
+            margin-bottom: 3px;
         }
         .bg-grid-item .name {
-            color: rgba(255,255,255,0.6);
-            font-size: 0.7em;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.6em;
         }
         .save-btn-confirm {
             width: 100%;
@@ -384,12 +412,14 @@
             .controls { gap: 6px; }
             .btn { padding: 10px 12px; font-size: 0.75em; min-width: 70px; }
             .nav-btn { padding: 10px 15px; font-size: 0.8em; }
+            .size-grid { grid-template-columns: repeat(2, 1fr); }
             .bg-grid { grid-template-columns: repeat(3, 1fr); }
         }
         @media (max-width: 360px) {
             .container { padding: 12px; }
             .quote-text { font-size: 1.1em; }
             .btn { font-size: 0.7em; padding: 8px 10px; min-width: 60px; }
+            .size-grid { grid-template-columns: repeat(2, 1fr); }
             .bg-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
@@ -512,13 +542,19 @@
         </div>
     </div>
 
-    <!-- نافذة اختيار الخلفية للحفظ -->
+    <!-- نافذة اختيار التحميل -->
     <div id="saveModal" class="modal">
         <div class="modal-content save-modal-content">
             <span class="close-btn" id="closeSave">&times;</span>
-            <h2>اختر خلفية الصورة</h2>
+            <h2>تحميل القول كصورة</h2>
+            
+            <div class="save-section-title">اختر المقاس</div>
+            <div class="size-grid" id="sizeGrid"></div>
+            
+            <div class="save-section-title">اختر الخلفية</div>
             <div class="bg-grid" id="bgGrid"></div>
-            <button id="confirmSave" class="save-btn-confirm">حفظ الصورة بهذه الخلفية</button>
+            
+            <button id="confirmSave" class="save-btn-confirm">تحميل الصورة</button>
         </div>
     </div>
 
