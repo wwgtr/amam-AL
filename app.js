@@ -1,585 +1,1016 @@
 (function() {
     'use strict';
     
-    var currentIndex = 0;
-    var quotes = [];
-    var fontSizeMultiplier = 1;
-    var selectedBg = 0;
-    var selectedSize = 0;
-    var timerInterval = null;
-    
-    // مقاسات التحميل (9 خيارات)
-    var sizes = [
-        { name: 'ستوري', dims: '1080×1920', icon: '📱', w: 1080, h: 1920 },
-        { name: 'منشور انستا', dims: '1080×1080', icon: '📷', w: 1080, h: 1080 },
-        { name: 'بورترية انستا', dims: '1080×1350', icon: '🖼️', w: 1080, h: 1350 },
-        { name: 'منشور تلجرام', dims: '1200×630', icon: '✈️', w: 1200, h: 630 },
-        { name: 'ستوري تلجرام', dims: '1080×1920', icon: '📺', w: 1080, h: 1920 },
-        { name: 'منشور فيسبوك', dims: '1200×630', icon: '📘', w: 1200, h: 630 },
-        { name: 'ستوري فيسبوك', dims: '1080×1920', icon: '📖', w: 1080, h: 1920 },
-        { name: 'غلاف فيسبوك', dims: '851×315', icon: '🖌️', w: 851, h: 315 },
-        { name: 'ملصق شفاف', dims: '2000×2000', icon: '🏷️', w: 2000, h: 2000 }
+    // ============================================
+    // قائمة الأقوال (محرك البيانات)
+    // ============================================
+    var quotes = [
+        {
+            id: 1,
+            text: "لا تظنن كلمة خرجت من أحد إلا وفي نفسه من الخير ما ليس في نفسك",
+            author: "الإمام علي بن أبي طالب",
+            category: "الحكمة"
+        },
+        {
+            id: 2,
+            text: "أفضل الجهاد من جاهد نفسه التي بين جنبيه",
+            author: "الإمام علي بن أبي طالب",
+            category: "الجهاد"
+        },
+        {
+            id: 3,
+            text: "لا تكن عبد غيرك وقد جعلك الله حراً",
+            author: "الإمام علي بن أبي طالب",
+            category: "الحرية"
+        },
+        {
+            id: 4,
+            text: "العلم خير من المال، العلم يحرسك وأنت تحرس المال",
+            author: "الإمام علي بن أبي طالب",
+            category: "العلم"
+        },
+        {
+            id: 5,
+            text: "الصبر مطية لا تكبو",
+            author: "الإمام علي بن أبي طالب",
+            category: "الصبر"
+        },
+        {
+            id: 6,
+            text: "من أطال الأمل أساء العمل",
+            author: "الإمام علي بن أبي طالب",
+            category: "العمل"
+        },
+        {
+            id: 7,
+            text: "لا خير في قول لا يفعل، ولا في عمل لا يخلص، ولا في عبادة لا يعقل",
+            author: "الإمام علي بن أبي طالب",
+            category: "الإخلاص"
+        },
+        {
+            id: 8,
+            text: "أشد الذنوب ما استخف به صاحبه",
+            author: "الإمام علي بن أبي طالب",
+            category: "الذنوب"
+        },
+        {
+            id: 9,
+            text: "لا تطلب السرعة في العمل، واطلب الإتقان فيه",
+            author: "الإمام علي بن أبي طالب",
+            category: "الإتقان"
+        },
+        {
+            id: 10,
+            text: "من كثر كلامه كثر خطؤه",
+            author: "الإمام علي بن أبي طالب",
+            category: "الكلام"
+        }
     ];
     
-    // 40 خلفية متنوعة (عادية، مخططة، منقطة، هندسية، نجوم)
+    // ============================================
+    // خيارات التحميل (مقاسات السوشيال ميديا)
+    // ============================================
+    var downloadOptions = [
+        // ستوري
+        { name: 'ستوري انستا', dims: '1080×1920', icon: '📱', w: 1080, h: 1920, platform: 'instagram' },
+        { name: 'ستوري فيسبوك', dims: '1080×1920', icon: '📖', w: 1080, h: 1920, platform: 'facebook' },
+        { name: 'ستوري تلجرام', dims: '1080×1920', icon: '📺', w: 1080, h: 1920, platform: 'telegram' },
+        { name: 'حالة واتساب', dims: '750×1334', icon: '💬', w: 750, h: 1334, platform: 'whatsapp' },
+        
+        // منشورات انستا
+        { name: 'منشور انستا (مربع)', dims: '1080×1080', icon: '📷', w: 1080, h: 1080, platform: 'instagram' },
+        { name: 'بورترية انستا', dims: '1080×1350', icon: '🖼️', w: 1080, h: 1350, platform: 'instagram' },
+        { name: 'بكرات انستا', dims: '1080×1920', icon: '🎬', w: 1080, h: 1920, platform: 'instagram' },
+        
+        // منشورات تلجرام
+        { name: 'منشور تلجرام', dims: '1200×630', icon: '✈️', w: 1200, h: 630, platform: 'telegram' },
+        { name: 'قناة تلجرام (كبير)', dims: '1920×1080', icon: '📡', w: 1920, h: 1080, platform: 'telegram' },
+        
+        // قياسات فيسبوك
+        { name: 'منشور فيسبوك', dims: '1200×630', icon: '📘', w: 1200, h: 630, platform: 'facebook' },
+        { name: 'غلاف فيسبوك', dims: '851×315', icon: '🖌️', w: 851, h: 315, platform: 'facebook' },
+        { name: 'صورة بروفايل فيسبوك', dims: '400×400', icon: '👤', w: 400, h: 400, platform: 'facebook' },
+        
+        // ملصق شفاف عالي الدقة
+        { name: 'ملصق شفاف (HD)', dims: '2000×2000', icon: '🏷️', w: 2000, h: 2000, platform: 'sticker' },
+        { name: 'ملصق شفاف (4K)', dims: '4000×4000', icon: '💎', w: 4000, h: 4000, platform: 'sticker' },
+        
+        // إضافات
+        { name: 'تويتر (منشور)', dims: '400×220', icon: '🐦', w: 400, h: 220, platform: 'twitter' },
+        { name: 'لينكد إن (منشور)', dims: '1104×736', icon: '💼', w: 1104, h: 736, platform: 'linkedin' },
+        { name: 'يوتيوب (غلاف)', dims: '2560×1440', icon: '▶️', w: 2560, h: 1440, platform: 'youtube' }
+    ];
+    
+    // ============================================
+    // خلفيات متنوعة
+    // ============================================
     var backgrounds = [
-        // خلفيات عادية (10)
-        { name: 'ذهبي كلاسيك', colors: ['#0a0505','#1a0a05','#0a0510','#000000'], type: 'gradient' },
-        { name: 'أزرق ليلي', colors: ['#050a15','#0a1530','#051020','#000510'], type: 'gradient' },
-        { name: 'أخضر زمردي', colors: ['#050a08','#0a1a10','#051008','#000a05'], type: 'gradient' },
-        { name: 'بنفسجي ملكي', colors: ['#0a0515','#150a25','#0a0510','#05000a'], type: 'gradient' },
-        { name: 'أحمر غامق', colors: ['#150505','#250a0a','#100505','#0a0000'], type: 'gradient' },
-        { name: 'وردي ناعم', colors: ['#1a0a15','#2a1520','#150a10','#0a0508'], type: 'gradient' },
-        { name: 'كحلي أنيق', colors: ['#050a15','#0a1025','#050810','#00050a'], type: 'gradient' },
-        { name: 'نحاسي دافئ', colors: ['#150a05','#251510','#100a05','#0a0500'], type: 'gradient' },
-        { name: 'رمادي دخاني', colors: ['#0a0a0a','#151515','#0a0a0a','#050505'], type: 'gradient' },
-        { name: 'تركواز', colors: ['#051015','#0a2025','#051518','#000a0e'], type: 'gradient' },
-        // خلفيات مخططة (10)
-        { name: 'مخطط ذهبي', colors: ['#0a0505','#d4a843'], type: 'stripes', stripeWidth: 40 },
-        { name: 'مخطط أزرق', colors: ['#050a15','#1a3a6a'], type: 'stripes', stripeWidth: 30 },
-        { name: 'مخطط أخضر', colors: ['#050a08','#1a4a2a'], type: 'stripes', stripeWidth: 35 },
-        { name: 'مخطط بنفسجي', colors: ['#0a0515','#3a1a5a'], type: 'stripes', stripeWidth: 45 },
-        { name: 'مخطط أحمر', colors: ['#150505','#5a1a1a'], type: 'stripes', stripeWidth: 25 },
-        { name: 'مخطط وردي', colors: ['#1a0a15','#5a2a3a'], type: 'stripes', stripeWidth: 50 },
-        { name: 'مخطط كحلي', colors: ['#050a15','#2a3a5a'], type: 'stripes', stripeWidth: 30 },
-        { name: 'مخطط نحاسي', colors: ['#150a05','#5a3a1a'], type: 'stripes', stripeWidth: 40 },
-        { name: 'مخطط رمادي', colors: ['#0a0a0a','#3a3a3a'], type: 'stripes', stripeWidth: 35 },
-        { name: 'مخطط تركواز', colors: ['#051015','#1a4a4a'], type: 'stripes', stripeWidth: 45 },
-        // خلفيات منقطة (10)
-        { name: 'منقط ذهبي', colors: ['#0a0505','#d4a843'], type: 'dots', dotSize: 8, dotSpacing: 40 },
-        { name: 'منقط أزرق', colors: ['#050a15','#1a3a6a'], type: 'dots', dotSize: 6, dotSpacing: 35 },
-        { name: 'منقط أخضر', colors: ['#050a08','#1a4a2a'], type: 'dots', dotSize: 10, dotSpacing: 50 },
-        { name: 'منقط بنفسجي', colors: ['#0a0515','#3a1a5a'], type: 'dots', dotSize: 7, dotSpacing: 30 },
-        { name: 'منقط أحمر', colors: ['#150505','#5a1a1a'], type: 'dots', dotSize: 9, dotSpacing: 45 },
-        { name: 'منقط وردي', colors: ['#1a0a15','#5a2a3a'], type: 'dots', dotSize: 5, dotSpacing: 25 },
-        { name: 'منقط كحلي', colors: ['#050a15','#2a3a5a'], type: 'dots', dotSize: 8, dotSpacing: 40 },
-        { name: 'منقط نحاسي', colors: ['#150a05','#5a3a1a'], type: 'dots', dotSize: 6, dotSpacing: 35 },
-        { name: 'منقط رمادي', colors: ['#0a0a0a','#3a3a3a'], type: 'dots', dotSize: 7, dotSpacing: 30 },
-        { name: 'منقط تركواز', colors: ['#051015','#1a4a4a'], type: 'dots', dotSize: 10, dotSpacing: 50 },
-        // خلفيات هندسية ونجوم (10)
-        { name: 'هندسي ذهبي', colors: ['#0a0505','#d4a843'], type: 'geometric', shape: 'hexagon' },
-        { name: 'هندسي أزرق', colors: ['#050a15','#1a3a6a'], type: 'geometric', shape: 'triangle' },
-        { name: 'هندسي أخضر', colors: ['#050a08','#1a4a2a'], type: 'geometric', shape: 'diamond' },
-        { name: 'هندسي بنفسجي', colors: ['#0a0515','#3a1a5a'], type: 'geometric', shape: 'circle' },
-        { name: 'هندسي أحمر', colors: ['#150505','#5a1a1a'], type: 'geometric', shape: 'square' },
-        { name: 'نجوم ذهبية', colors: ['#0a0505','#d4a843'], type: 'stars', starCount: 50 },
-        { name: 'نجوم زرقاء', colors: ['#050a15','#1a3a6a'], type: 'stars', starCount: 60 },
-        { name: 'نجوم خضراء', colors: ['#050a08','#1a4a2a'], type: 'stars', starCount: 40 },
-        { name: 'نجوم بنفسجية', colors: ['#0a0515','#3a1a5a'], type: 'stars', starCount: 55 },
-        { name: 'نجوم حمراء', colors: ['#150505','#5a1a1a'], type: 'stars', starCount: 45 }
+        // خلفيات طبيعية
+        { id: 'bg-nature-1', name: 'غروب', type: 'gradient', colors: ['#ff7e5f', '#feb47b'], pattern: 'none' },
+        { id: 'bg-nature-2', name: 'بحر', type: 'gradient', colors: ['#00b4db', '#0083b0'], pattern: 'none' },
+        { id: 'bg-nature-3', name: 'غابة', type: 'gradient', colors: ['#134e5e', '#71b280'], pattern: 'none' },
+        { id: 'bg-nature-4', name: 'سماء ليلية', type: 'gradient', colors: ['#0f0c29', '#302b63', '#24243e'], pattern: 'none' },
+        
+        // خلفيات مخططة
+        { id: 'bg-stripe-1', name: 'مخطط أفقي', type: 'solid', colors: ['#667eea', '#764ba2'], pattern: 'stripes-horizontal' },
+        { id: 'bg-stripe-2', name: 'مخطط عمودي', type: 'solid', colors: ['#f093fb', '#f5576c'], pattern: 'stripes-vertical' },
+        { id: 'bg-stripe-3', name: 'مخطط قطري', type: 'solid', colors: ['#4facfe', '#00f2fe'], pattern: 'stripes-diagonal' },
+        { id: 'bg-stripe-4', name: 'مخطط متقاطع', type: 'solid', colors: ['#43e97b', '#38f9d7'], pattern: 'stripes-cross' },
+        
+        // خلفيات ناعمة
+        { id: 'bg-soft-1', name: 'وردي ناعم', type: 'gradient', colors: ['#fccb90', '#d57eeb'], pattern: 'none' },
+        { id: 'bg-soft-2', name: 'أزرق ناعم', type: 'gradient', colors: ['#a18cd1', '#fbc2eb'], pattern: 'none' },
+        { id: 'bg-soft-3', name: 'أخضر ناعم', type: 'gradient', colors: ['#84fab0', '#8fd3f4'], pattern: 'none' },
+        { id: 'bg-soft-4', name: 'ذهبي ناعم', type: 'gradient', colors: ['#fa709a', '#fee140'], pattern: 'none' },
+        
+        // خلفيات داكنة
+        { id: 'bg-dark-1', name: 'داكن أنيق', type: 'solid', colors: ['#2c3e50', '#3498db'], pattern: 'none' },
+        { id: 'bg-dark-2', name: 'داكن فاخر', type: 'solid', colors: ['#1a1a2e', '#16213e'], pattern: 'none' },
+        { id: 'bg-dark-3', name: 'داكن نجمي', type: 'solid', colors: ['#0d0d0d', '#1a1a2e'], pattern: 'dots' },
+        
+        // خلفيات بنمط نقاط
+        { id: 'bg-dots-1', name: 'نقاط صغيرة', type: 'solid', colors: ['#667eea', '#764ba2'], pattern: 'dots-small' },
+        { id: 'bg-dots-2', name: 'نقاط كبيرة', type: 'solid', colors: ['#f093fb', '#f5576c'], pattern: 'dots-large' },
+        
+        // خلفيات خشبية/رخامية
+        { id: 'bg-marble-1', name: 'رخام أبيض', type: 'solid', colors: ['#f5f7fa', '#c3cfe2'], pattern: 'marble' },
+        { id: 'bg-marble-2', name: 'خشب', type: 'solid', colors: ['#8e6e53', '#c4a882'], pattern: 'wood' },
+        
+        // خلفيات هندسية
+        { id: 'bg-geo-1', name: 'هندسي مثلثات', type: 'solid', colors: ['#667eea', '#764ba2'], pattern: 'triangles' },
+        { id: 'bg-geo-2', name: 'هندسي دوائر', type: 'solid', colors: ['#f093fb', '#f5576c'], pattern: 'circles' },
+        { id: 'bg-geo-3', name: 'هندسي سداسي', type: 'solid', colors: ['#4facfe', '#00f2fe'], pattern: 'hexagons' },
+        
+        // خلفيات زهور
+        { id: 'bg-floral-1', name: 'زهور صغيرة', type: 'solid', colors: ['#ffecd2', '#fcb69f'], pattern: 'floral-small' },
+        { id: 'bg-floral-2', name: 'زهور كبيرة', type: 'solid', colors: ['#a18cd1', '#fbc2eb'], pattern: 'floral-large' },
+        
+        // خلفيات إسلامية
+        { id: 'bg-islamic-1', name: 'زخرفة إسلامية', type: 'solid', colors: ['#0f2027', '#203a43', '#2c5364'], pattern: 'islamic' },
+        { id: 'bg-islamic-2', name: 'قبة ذهبية', type: 'gradient', colors: ['#8e2de2', '#4a00e0'], pattern: 'none' },
+        
+        // خلفيات ألوان صلبة
+        { id: 'bg-solid-1', name: 'أحمر', type: 'solid', colors: ['#e74c3c'], pattern: 'none' },
+        { id: 'bg-solid-2', name: 'أزرق', type: 'solid', colors: ['#3498db'], pattern: 'none' },
+        { id: 'bg-solid-3', name: 'أخضر', type: 'solid', colors: ['#2ecc71'], pattern: 'none' },
+        { id: 'bg-solid-4', name: 'أصفر', type: 'solid', colors: ['#f1c40f'], pattern: 'none' },
+        { id: 'bg-solid-5', name: 'بنفسجي', type: 'solid', colors: ['#9b59b6'], pattern: 'none' },
+        { id: 'bg-solid-6', name: 'برتقالي', type: 'solid', colors: ['#e67e22'], pattern: 'none' },
+        { id: 'bg-solid-7', name: 'أسود', type: 'solid', colors: ['#000000'], pattern: 'none' },
+        { id: 'bg-solid-8', name: 'أبيض', type: 'solid', colors: ['#ffffff'], pattern: 'none' }
     ];
     
-    function init() {
-        if (typeof quotesData !== 'undefined' && quotesData.length > 0) {
-            quotes = quotesData;
-            showQuote(0);
-        } else {
-            document.getElementById('quoteContent').textContent = 'لا توجد أقوال متاحة';
-        }
+    // ============================================
+    // محرك التطبيق (Application Engine)
+    // ============================================
+    var engine = {
+        // الحالة الحالية
+        currentIndex: 0,
+        favorites: JSON.parse(localStorage.getItem('favorites')) || [],
+        history: [],
+        isDarkMode: false,
+        selectedBg: 0,
+        selectedDownload: 0,
+        fontSizeMultiplier: 1,
         
-        initParticles();
-        initSizeGrid();
-        initBgGrid();
+        // ============================================
+        // دوال التهيئة
+        // ============================================
+        init: function() {
+            this.loadSettings();
+            this.displayQuote(this.currentIndex);
+            this.setupEventListeners();
+            this.updateUI();
+            this.renderBackgrounds();
+            this.renderDownloadOptions();
+        },
         
-        document.getElementById('shuffleBtn').addEventListener('click', shuffleQuote);
-        document.getElementById('prevBtn').addEventListener('click', prevQuote);
-        document.getElementById('nextBtn').addEventListener('click', nextQuote);
-        document.getElementById('saveBtn').addEventListener('click', openSaveModal);
-        document.getElementById('shareBtn').addEventListener('click', shareQuote);
-        document.getElementById('allQuotesBtn').addEventListener('click', openAllQuotes);
-        document.getElementById('aboutBtn').addEventListener('click', openAbout);
-        document.getElementById('settingsBtn').addEventListener('click', openSettings);
-        document.getElementById('closeAllQuotes').addEventListener('click', closeAllQuotes);
-        document.getElementById('closeAbout').addEventListener('click', closeAbout);
-        document.getElementById('closeSettings').addEventListener('click', closeSettings);
-        document.getElementById('closeSave').addEventListener('click', closeSaveModal);
-        document.getElementById('confirmSave').addEventListener('click', saveAsImage);
-        document.getElementById('searchInput').addEventListener('input', searchQuotes);
-        document.getElementById('fontSizeSelect').addEventListener('change', changeFontSize);
-        document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
-        document.getElementById('minimalModeToggle').addEventListener('click', toggleMinimalMode);
-        document.getElementById('timerSelect').addEventListener('change', toggleTimer);
+        // ============================================
+        // دوال عرض الأقوال
+        // ============================================
+        displayQuote: function(index) {
+            if (index < 0 || index >= quotes.length) {
+                console.error('Index out of bounds:', index);
+                return;
+            }
+            
+            var quote = quotes[index];
+            var quoteText = document.getElementById('quote-text');
+            var quoteAuthor = document.getElementById('quote-author');
+            var quoteCounter = document.getElementById('quote-counter');
+            var quoteCategory = document.getElementById('quote-category');
+            
+            if (quoteText) quoteText.textContent = quote.text;
+            if (quoteAuthor) quoteAuthor.textContent = '— ' + quote.author;
+            if (quoteCounter) quoteCounter.textContent = (index + 1) + ' / ' + quotes.length;
+            if (quoteCategory) quoteCategory.textContent = quote.category;
+            
+            // تطبيق حجم الخط
+            this.applyFontSize();
+            
+            // إضافة للتاريخ
+            this.addToHistory(index);
+        },
         
-        window.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal')) e.target.classList.remove('active');
-        });
+        // ============================================
+        // دوال التنقل
+        // ============================================
+        nextQuote: function() {
+            this.currentIndex = (this.currentIndex + 1) % quotes.length;
+            this.displayQuote(this.currentIndex);
+            this.updateUI();
+        },
         
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'ArrowRight') prevQuote();
-            if (e.key === 'ArrowLeft') nextQuote();
-            if (e.key === ' ') { e.preventDefault(); shuffleQuote(); }
-        });
+        prevQuote: function() {
+            this.currentIndex = (this.currentIndex - 1 + quotes.length) % quotes.length;
+            this.displayQuote(this.currentIndex);
+            this.updateUI();
+        },
         
-        var touchStartX = 0, touchEndX = 0;
-        document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches<span class="footnote-wrapper">[0](0)</span>.screenX; }, {passive: true});
-        document.addEventListener('touchend', function(e) {
-            touchEndX = e.changedTouches<span class="footnote-wrapper">[0](0)</span>.screenX;
-            var diff = touchStartX - touchEndX;
-            if (Math.abs(diff) > 50) { if (diff > 0) nextQuote(); else prevQuote(); }
-        }, {passive: true});
-    }
-    
-    function initSizeGrid() {
-        var grid = document.getElementById('sizeGrid');
-        grid.innerHTML = '';
-        for (var i = 0; i < sizes.length; i++) {
-            (function(idx) {
-                var div = document.createElement('div');
-                div.className = 'size-item' + (idx === selectedSize ? ' selected' : '');
-                div.innerHTML = '<div class="size-icon">' + sizes[idx].icon + '</div><div class="size-name">' + sizes[idx].name + '</div><div class="size-dims">' + sizes[idx].dims + '</div>';
-                div.addEventListener('click', function() {
-                    document.querySelectorAll('.size-item').forEach(function(el) { el.classList.remove('selected'); });
-                    div.classList.add('selected');
-                    selectedSize = idx;
-                });
-                grid.appendChild(div);
-            })(i);
-        }
-    }
-    
-    function initBgGrid() {
-        var grid = document.getElementById('bgGrid');
-        grid.innerHTML = '';
-        for (var i = 0; i < backgrounds.length; i++) {
-            (function(idx) {
-                var div = document.createElement('div');
-                div.className = 'bg-grid-item' + (idx === selectedBg ? ' selected' : '');
-                var previewStyle = '';
-                var bg = backgrounds[idx];
-                if (bg.type === 'gradient') {
-                    previewStyle = 'background: linear-gradient(135deg, ' + bg.colors.join(',') + ');';
-                } else if (bg.type === 'stripes') {
-                    previewStyle = 'background: repeating-linear-gradient(45deg, ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ ' 0px, ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ ' ' + bg.stripeWidth + 'px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ' ' + bg.stripeWidth + 'px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ' ' + (bg.stripeWidth*2) + 'px);';
-                } else if (bg.type === 'dots') {
-                    previewStyle = 'background: ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ '; background-image: radial-gradient(' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ' ' + bg.dotSize + 'px, transparent ' + bg.dotSize + 'px); background-size: ' + bg.dotSpacing + 'px ' + bg.dotSpacing + 'px;';
-                } else if (bg.type === 'geometric') {
-                    previewStyle = 'background: ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ '; background-image: repeating-conic-gradient(' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ' 0% 25%, transparent 0% 50%); background-size: 20px 20px;';
-                } else if (bg.type === 'stars') {
-                    previewStyle = 'background: ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ '; background-image: radial-gradient(2px 2px at 20px 30px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ', transparent), radial-gradient(2px 2px at 40px 70px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ', transparent), radial-gradient(2px 2px at 50px 160px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ', transparent), radial-gradient(2px 2px at 90px 40px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ', transparent), radial-gradient(2px 2px at 130px 80px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ', transparent); background-size: 200px 200px;';
-                }
-                div.innerHTML = '<div class="preview" style="' + previewStyle + '"></div><div class="name">' + bg.name + '</div>';
-                div.addEventListener('click', function() {
-                    document.querySelectorAll('.bg-grid-item').forEach(function(el) { el.classList.remove('selected'); });
-                    div.classList.add('selected');
-                    selectedBg = idx;
-                });
-                grid.appendChild(div);
-            })(i);
-        }
-    }
-    
-    function initParticles() {
-        var canvas = document.getElementById('particlesCanvas');
-        var ctx = canvas.getContext('2d');
-        var particles = [];
-        var mouseX = 0, mouseY = 0;
+        randomQuote: function() {
+            var randomIndex = Math.floor(Math.random() * quotes.length);
+            this.currentIndex = randomIndex;
+            this.displayQuote(this.currentIndex);
+            this.updateUI();
+        },
         
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        resize();
-        window.addEventListener('resize', resize);
+        goToQuote: function(index) {
+            if (index >= 0 && index < quotes.length) {
+                this.currentIndex = index;
+                this.displayQuote(this.currentIndex);
+                this.updateUI();
+            }
+        },
         
-        for (var i = 0; i < 80; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 4 + 1,
-                speedX: (Math.random() - 0.5) * 1.5,
-                speedY: (Math.random() - 0.5) * 1.5 - 0.5,
-                opacity: Math.random() * 0.8 + 0.2,
-                color: getColor(),
-                life: Math.random() * 100 + 50,
-                maxLife: Math.random() * 100 + 50
+        // ============================================
+        // دوال المفضلة
+        // ============================================
+        toggleFavorite: function() {
+            var currentQuote = quotes[this.currentIndex];
+            var isFavorite = this.favorites.some(function(fav) {
+                return fav.id === currentQuote.id;
             });
-        }
-        
-        function getColor() {
-            var colors = [
-                {r:255,g:200,b:50},{r:255,g:150,b:30},{r:255,g:100,b:20},
-                {r:255,g:50,b:10},{r:200,g:100,b:20},{r:255,g:220,b:100},{r:255,g:180,b:60}
-            ];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-        
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (var i = 0; i < particles.length; i++) {
-                var p = particles[i];
-                p.x += p.speedX;
-                p.y += p.speedY;
-                p.life--;
-                
-                var dx = mouseX - p.x, dy = mouseY - p.y, dist = Math.sqrt(dx*dx+dy*dy);
-                if (dist < 200) { p.speedX -= dx/dist*0.02; p.speedY -= dy/dist*0.02; }
-                
-                if (p.life <= 0 || p.x < -50 || p.x > canvas.width+50 || p.y < -50 || p.y > canvas.height+50) {
-                    p.x = Math.random()*canvas.width; p.y = canvas.height+20;
-                    p.speedX = (Math.random()-0.5)*1.5; p.speedY = -(Math.random()*2+0.5);
-                    p.life = p.maxLife; p.color = getColor(); p.size = Math.random()*4+1;
-                }
-                
-                var alpha = p.opacity * (p.life/p.maxLife);
-                var glow = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*4);
-                glow.addColorStop(0,'rgba('+p.color.r+','+p.color.g+','+p.color.b+','+(alpha*0.3)+')');
-                glow.addColorStop(1,'rgba('+p.color.r+','+p.color.g+','+p.color.b+',0)');
-                ctx.fillStyle = glow;
-                ctx.beginPath(); ctx.arc(p.x,p.y,p.size*4,0,Math.PI*2); ctx.fill();
-                
-                ctx.fillStyle = 'rgba('+p.color.r+','+p.color.g+','+p.color.b+','+alpha+')';
-                ctx.shadowColor = 'rgba('+p.color.r+','+p.color.g+','+p.color.b+','+(alpha*0.5)+')';
-                ctx.shadowBlur = 15;
-                ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
-                ctx.shadowBlur = 0;
+            
+            if (isFavorite) {
+                this.favorites = this.favorites.filter(function(fav) {
+                    return fav.id !== currentQuote.id;
+                });
+            } else {
+                this.favorites.push(currentQuote);
             }
-            requestAnimationFrame(animate);
-        }
+            
+            localStorage.setItem('favorites', JSON.stringify(this.favorites));
+            this.updateUI();
+        },
         
-        document.addEventListener('mousemove', function(e) { mouseX=e.clientX; mouseY=e.clientY; });
-        animate();
-    }
-    
-    function showQuote(index) {
-        if (quotes.length === 0) return;
-        currentIndex = (index + quotes.length) % quotes.length;
-        var quote = quotes[currentIndex];
-        var el = document.getElementById('quoteContent');
-        el.textContent = quote.text;
-        updateFontSize(quote.text.length);
-    }
-    
-    function updateFontSize(textLength) {
-        var el = document.getElementById('quoteContent');
-        var baseSize;
-        if (textLength <= 30) baseSize = 2.0;
-        else if (textLength <= 50) baseSize = 1.6;
-        else if (textLength <= 80) baseSize = 1.3;
-        else if (textLength <= 120) baseSize = 1.1;
-        else baseSize = 0.95;
-        el.style.fontSize = (baseSize * fontSizeMultiplier) + 'em';
-    }
-    
-    function changeFontSize() {
-        var val = document.getElementById('fontSizeSelect').value;
-        if (val === 'small') fontSizeMultiplier = 0.8;
-        else if (val === 'medium') fontSizeMultiplier = 1;
-        else if (val === 'large') fontSizeMultiplier = 1.3;
-        else if (val === 'xlarge') fontSizeMultiplier = 1.6;
-        var quote = quotes[currentIndex];
-        if (quote) updateFontSize(quote.text.length);
-        showToast('تم تغيير حجم الخط');
-    }
-    
-    function toggleDarkMode() {
-        var container = document.getElementById('mainContainer');
-        var track = document.getElementById('darkModeTrack');
-        container.classList.toggle('dark-mode');
-        track.classList.toggle('active');
-        showToast(container.classList.contains('dark-mode') ? 'تم تفعيل الوضع الداكن' : 'تم إلغاء الوضع الداكن');
-    }
-    
-    function toggleMinimalMode() {
-        var container = document.getElementById('mainContainer');
-        var track = document.getElementById('minimalModeTrack');
-        container.classList.toggle('minimal-mode');
-        track.classList.toggle('active');
-        showToast(container.classList.contains('minimal-mode') ? 'تم إخفاء العناصر' : 'تم إظهار العناصر');
-    }
-    
-    function toggleTimer() {
-        var val = parseInt(document.getElementById('timerSelect').value);
-        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-        if (val > 0) {
-            timerInterval = setInterval(function() { nextQuote(); }, val * 1000);
-            showToast('تم تفعيل المؤقت التلقائي كل ' + val + ' ثواني');
-        } else {
-            showToast('تم إيقاف المؤقت التلقائي');
-        }
-    }
-    
-    function shuffleQuote() { showQuote(Math.floor(Math.random()*quotes.length)); showToast('تم اختيار قول عشوائي'); }
-    function prevQuote() { showQuote(currentIndex-1); }
-    function nextQuote() { showQuote(currentIndex+1); }
-    function openAllQuotes() { document.getElementById('allQuotesModal').classList.add('active'); displayAllQuotes(quotes); }
-    function closeAllQuotes() { document.getElementById('allQuotesModal').classList.remove('active'); }
-    function openAbout() { document.getElementById('aboutModal').classList.add('active'); }
-    function closeAbout() { document.getElementById('aboutModal').classList.remove('active'); }
-    function openSettings() { document.getElementById('settingsModal').classList.add('active'); }
-    function closeSettings() { document.getElementById('settingsModal').classList.remove('active'); }
-    function openSaveModal() { document.getElementById('saveModal').classList.add('active'); }
-    function closeSaveModal() { document.getElementById('saveModal').classList.remove('active'); }
-    
-    function displayAllQuotes(arr) {
-        var list = document.getElementById('quotesList');
-        list.innerHTML = '';
-        for (var i=0;i<arr.length;i++) {
-            (function(idx){
-                var item = document.createElement('div');
-                item.className = 'quote-item';
-                item.innerHTML = '<div class="q-text">'+arr[idx].text+'</div><div class="q-number">#'+(idx+1)+'</div>';
-                item.addEventListener('click',function(){ showQuote(idx); closeAllQuotes(); });
-                list.appendChild(item);
-            })(i);
-        }
-    }
-    
-    function searchQuotes() {
-        var term = this.value.toLowerCase();
-        var termClean = term.replace(/[ًٌٍَُِّْ]/g, '');
-        var filtered = [];
-        for (var i=0;i<quotes.length;i++) {
-            var textClean = quotes[i].text.replace(/[ًٌٍَُِّْ]/g, '');
-            if (textClean.toLowerCase().includes(termClean) || quotes[i].text.toLowerCase().includes(term)) {
-                filtered.push(quotes[i]);
+        isCurrentFavorite: function() {
+            var currentQuote = quotes[this.currentIndex];
+            return this.favorites.some(function(fav) {
+                return fav.id === currentQuote.id;
+            });
+        },
+        
+        // ============================================
+        // دوال البحث
+        // ============================================
+        searchQuotes: function(query) {
+            if (!query || query.trim() === '') {
+                return quotes;
             }
-        }
-        displayAllQuotes(filtered);
-    }
-    
-    function shareQuote() {
-        var quote = quotes[currentIndex];
-        if (!quote) return;
-        var text = 'قال الإمام علي (عليه السلام):\n\n' + quote.text + '\n\n— موقع أقوال الإمام علي';
-        var url = window.location.href;
+            
+            var searchTerm = query.toLowerCase().trim();
+            return quotes.filter(function(quote) {
+                return quote.text.toLowerCase().includes(searchTerm) ||
+                       quote.author.toLowerCase().includes(searchTerm) ||
+                       quote.category.toLowerCase().includes(searchTerm);
+            });
+        },
         
-        if (navigator.share) {
-            navigator.share({ title: 'أقوال الإمام علي', text: text, url: url })
-                .then(function() { showToast('تم المشاركة بنجاح'); })
-                .catch(function() { showToast('تم إلغاء المشاركة'); });
-        } else {
-            var textarea = document.createElement('textarea');
-            textarea.value = text + '\n' + url;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showToast('تم نسخ النص للمشاركة');
-        }
-    }
-    
-    function saveAsImage() {
-        var quote = quotes[currentIndex];
-        if (!quote) return;
-        closeSaveModal();
-        
-        var canvas = document.getElementById('imageCanvas');
-        var ctx = canvas.getContext('2d');
-        var size = sizes[selectedSize];
-        canvas.width = size.w;
-        canvas.height = size.h;
-        
-        var bg = backgrounds[selectedBg];
-        
-        // رسم الخلفية حسب النوع
-        if (bg.type === 'gradient') {
-            var grad = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
-            grad.addColorStop(0, bg.colors<span class="footnote-wrapper">[0](0)</span>);
-            grad.addColorStop(0.3, bg.colors<span class="footnote-wrapper">[1](1)</span>);
-            grad.addColorStop(0.6, bg.colors<span class="footnote-wrapper">[2](2)</span>);
-            grad.addColorStop(1, bg.colors<span class="footnote-wrapper">[3](3)</span>);
-            ctx.fillStyle = grad;
-            ctx.fillRect(0,0,canvas.width,canvas.height);
-        } else if (bg.type === 'stripes') {
-            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[0](0)</span>;
-            ctx.fillRect(0,0,canvas.width,canvas.height);
-            var sw = bg.stripeWidth * (canvas.width / 1080);
-            for (var x = 0; x < canvas.width + canvas.height; x += sw * 2) {
-                ctx.save();
-                ctx.translate(x, 0);
-                ctx.rotate(45 * Math.PI / 180);
-                ctx.fillStyle = bg.colors<span class="footnote-wrapper">[1](1)</span>;
-                ctx.fillRect(0, -canvas.height, sw, canvas.height * 3);
-                ctx.restore();
+        // ============================================
+        // دوال التاريخ
+        // ============================================
+        addToHistory: function(index) {
+            this.history.push({
+                index: index,
+                timestamp: new Date().toISOString()
+            });
+            
+            // الاحتفاظ بآخر 50 مشاهدة فقط
+            if (this.history.length > 50) {
+                this.history.shift();
             }
-        } else if (bg.type === 'dots') {
-            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[0](0)</span>;
-            ctx.fillRect(0,0,canvas.width,canvas.height);
-            var ds = bg.dotSize * (canvas.width / 1080);
-            var dsp = bg.dotSpacing * (canvas.width / 1080);
-            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[1](1)</span>;
-            for (var dx = 0; dx < canvas.width; dx += dsp) {
-                for (var dy = 0; dy < canvas.height; dy += dsp) {
-                    ctx.beginPath();
-                    ctx.arc(dx, dy, ds, 0, Math.PI * 2);
-                    ctx.fill();
+        },
+        
+        getHistory: function() {
+            return this.history;
+        },
+        
+        // ============================================
+        // دوال الإعدادات
+        // ============================================
+        loadSettings: function() {
+            var savedSettings = localStorage.getItem('appSettings');
+            if (savedSettings) {
+                try {
+                    var settings = JSON.parse(savedSettings);
+                    this.isDarkMode = settings.isDarkMode || false;
+                    this.currentIndex = settings.lastIndex || 0;
+                    this.selectedBg = settings.selectedBg || 0;
+                    this.selectedDownload = settings.selectedDownload || 0;
+                    this.fontSizeMultiplier = settings.fontSizeMultiplier || 1;
+                } catch (e) {
+                    console.error('Error loading settings:', e);
                 }
             }
-        } else if (bg.type === 'geometric') {
-            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[0](0)</span>;
-            ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.strokeStyle = bg.colors<span class="footnote-wrapper">[1](1)</span>;
-            ctx.lineWidth = 2;
-            var gs = 40 * (canvas.width / 1080);
-            for (var gx = 0; gx < canvas.width + gs; gx += gs) {
-                for (var gy = 0; gy < canvas.height + gs; gy += gs) {
-                    if (bg.shape === 'hexagon') {
-                        ctx.beginPath();
-                        for (var hi = 0; hi < 6; hi++) {
-                            var ha = hi * Math.PI / 3 - Math.PI / 6;
-                            var hx = gx + gs/2 + gs/2 * Math.cos(ha);
-                            var hy = gy + gs/2 + gs/2 * Math.sin(ha);
-                            if (hi === 0) ctx.moveTo(hx, hy);
-                            else ctx.lineTo(hx, hy);
+        },
+        
+        saveSettings: function() {
+            var settings = {
+                isDarkMode: this.isDarkMode,
+                lastIndex: this.currentIndex,
+                selectedBg: this.selectedBg,
+                selectedDownload: this.selectedDownload,
+                fontSizeMultiplier: this.fontSizeMultiplier
+            };
+            localStorage.setItem('appSettings', JSON.stringify(settings));
+        },
+        
+        toggleDarkMode: function() {
+            this.isDarkMode = !this.isDarkMode;
+            document.body.classList.toggle('dark-mode', this.isDarkMode);
+            this.saveSettings();
+            this.updateUI();
+        },
+        
+        // ============================================
+        // دوال حجم الخط
+        // ============================================
+        changeFontSize: function(direction) {
+            if (direction === 'increase') {
+                this.fontSizeMultiplier = Math.min(this.fontSizeMultiplier + 0.1, 2);
+            } else if (direction === 'decrease') {
+                this.fontSizeMultiplier = Math.max(this.fontSizeMultiplier - 0.1, 0.5);
+            }
+            this.applyFontSize();
+            this.saveSettings();
+        },
+        
+        applyFontSize: function() {
+            var quoteText = document.getElementById('quote-text');
+            if (quoteText) {
+                quoteText.style.fontSize = (this.fontSizeMultiplier * 1.5) + 'rem';
+            }
+        },
+        
+        // ============================================
+        // دوال الخلفيات
+        // ============================================
+        renderBackgrounds: function() {
+            var container = document.getElementById('backgrounds-container');
+            if (!container) return;
+            
+            var html = '';
+            for (var i = 0; i < backgrounds.length; i++) {
+                var bg = backgrounds[i];
+                var isSelected = (i === this.selectedBg);
+                var bgStyle = this.getBackgroundStyle(bg);
+                
+                html += '<div class="bg-item' + (isSelected ? ' selected' : '') + '" data-index="' + i + '">';
+                html += '<div class="bg-preview" style="' + bgStyle + '"></div>';
+                html += '<span class="bg-name">' + bg.name + '</span>';
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+            
+            // إضافة مستمعي الأحداث
+            var self = this;
+            var bgItems = container.querySelectorAll('.bg-item');
+            bgItems.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    var index = parseInt(this.getAttribute('data-index'));
+                    self.selectBackground(index);
+                });
+            });
+        },
+        
+        getBackgroundStyle: function(bg) {
+            if (bg.type === 'gradient') {
+                if (bg.colors.length === 2) {
+                    return 'background: linear-gradient(135deg, ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ ', ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ');';
+                } else if (bg.colors.length === 3) {
+                    return 'background: linear-gradient(135deg, ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ ', ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ', ' + bg.colors<span class="footnote-wrapper">[2](2) </span>+ ');';
+                }
+            } else if (bg.type === 'solid') {
+                return 'background: ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ ';';
+            }
+            return 'background: #ffffff;';
+        },
+        
+        selectBackground: function(index) {
+            this.selectedBg = index;
+            this.saveSettings();
+            this.renderBackgrounds();
+            this.applyBackground();
+        },
+        
+        applyBackground: function() {
+            var bg = backgrounds[this.selectedBg];
+            var mainContainer = document.getElementById('main-container');
+            if (!mainContainer || !bg) return;
+            
+            var style = this.getBackgroundStyle(bg);
+            
+            // إضافة النمط إذا كان موجوداً
+            if (bg.pattern && bg.pattern !== 'none') {
+                style += ' background-size: cover; background-blend-mode: overlay;';
+            }
+            
+            mainContainer.style.cssText = style;
+        },
+        
+        // ============================================
+        // دوال خيارات التحميل
+        // ============================================
+        renderDownloadOptions: function() {
+            var container = document.getElementById('download-options-container');
+            if (!container) return;
+            
+            var html = '';
+            
+            // تجميع الخيارات حسب المنصة
+            var platforms = {
+                'instagram': { name: 'انستغرام', icon: '📷' },
+                'facebook': { name: 'فيسبوك', icon: '📘' },
+                'telegram': { name: 'تلغرام', icon: '✈️' },
+                'whatsapp': { name: 'واتساب', icon: '💬' },
+                'sticker': { name: 'ملصقات شفافة', icon: '🏷️' },
+                'twitter': { name: 'تويتر', icon: '🐦' },
+                'linkedin': { name: 'لينكد إن', icon: '💼' },
+                'youtube': { name: 'يوتيوب', icon: '▶️' }
+            };
+            
+            for (var platform in platforms) {
+                if (platforms.hasOwnProperty(platform)) {
+                    var platformOptions = downloadOptions.filter(function(opt) {
+                        return opt.platform === platform;
+                    });
+                    
+                    if (platformOptions.length > 0) {
+                        html += '<div class="download-group">';
+                        html += '<h3 class="group-title">' + platforms[platform].icon + ' ' + platforms[platform].name + '</h3>';
+                        html += '<div class="group-options">';
+                        
+                        for (var j = 0; j < platformOptions.length; j++) {
+                            var opt = platformOptions[j];
+                            var optIndex = downloadOptions.indexOf(opt);
+                            var isSelected = (optIndex === this.selectedDownload);
+                            
+                            html += '<div class="download-option' + (isSelected ? ' selected' : '') + '" data-index="' + optIndex + '">';
+                            html += '<span class="option-icon">' + opt.icon + '</span>';
+                            html += '<span class="option-name">' + opt.name + '</span>';
+                            html += '<span class="option-dims">' + opt.dims + '</span>';
+                            html += '</div>';
                         }
-                        ctx.closePath();
-                        ctx.stroke();
-                    } else if (bg.shape === 'triangle') {
-                        ctx.beginPath();
-                        ctx.moveTo(gx + gs/2, gy);
-                        ctx.lineTo(gx + gs, gy + gs);
-                        ctx.lineTo(gx, gy + gs);
-                        ctx.closePath();
-                        ctx.stroke();
-                    } else if (bg.shape === 'diamond') {
-                        ctx.beginPath();
-                        ctx.moveTo(gx + gs/2, gy);
-                        ctx.lineTo(gx + gs, gy + gs/2);
-                        ctx.lineTo(gx + gs/2, gy + gs);
-                        ctx.lineTo(gx, gy + gs/2);
-                        ctx.closePath();
-                        ctx.stroke();
-                    } else if (bg.shape === 'circle') {
-                        ctx.beginPath();
-                        ctx.arc(gx + gs/2, gy + gs/2, gs/3, 0, Math.PI * 2);
-                        ctx.stroke();
-                    } else if (bg.shape === 'square') {
-                        ctx.strokeRect(gx + gs/6, gy + gs/6, gs * 2/3, gs * 2/3);
+                        
+                        html += '</div>';
+                        html += '</div>';
                     }
                 }
             }
-        } else if (bg.type === 'stars') {
-            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[0](0)</span>;
-            ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[1](1)</span>;
-            for (var si = 0; si < bg.starCount; si++) {
-                var sx = Math.random() * canvas.width;
-                var sy = Math.random() * canvas.height;
-                var sr = Math.random() * 3 + 1;
+            
+            container.innerHTML = html;
+            
+            // إضافة مستمعي الأحداث
+            var self = this;
+            var downloadOptionsElements = container.querySelectorAll('.download-option');
+            downloadOptionsElements.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    var index = parseInt(this.getAttribute('data-index'));
+                    self.selectDownloadOption(index);
+                });
+            });
+        },
+        
+        selectDownloadOption: function(index) {
+            this.selectedDownload = index;
+            this.saveSettings();
+            this.renderDownloadOptions();
+        },
+        
+        // ============================================
+        // دوال التحميل
+        // ============================================
+        downloadQuote: function() {
+            var option = downloadOptions[this.selectedDownload];
+            if (!option) {
+                alert('الرجاء اختيار خيار تحميل');
+                return;
+            }
+            
+            var quote = quotes[this.currentIndex];
+            var canvas = document.createElement('canvas');
+            canvas.width = option.w;
+            canvas.height = option.h;
+            var ctx = canvas.getContext('2d');
+            
+            // تطبيق الخلفية
+            var bg = backgrounds[this.selectedBg];
+            this.drawBackground(ctx, canvas.width, canvas.height, bg);
+            
+            // رسم النص
+            ctx.fillStyle = this.isDarkMode ? '#ffffff' : '#000000';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // حساب حجم الخط المناسب
+            var fontSize = Math.min(canvas.width, canvas.height) * 0.06;
+            ctx.font = 'bold ' + fontSize + 'px Arial';
+            
+            // تقسيم النص إلى أسطر
+            var maxWidth = canvas.width * 0.8;
+            var lines = this.wrapText(ctx, quote.text, maxWidth);
+            var lineHeight = fontSize * 1.5;
+            var startY = canvas.height / 2 - (lines.length * lineHeight) / 2;
+            
+            // رسم كل سطر
+            for (var i = 0; i < lines.length; i++) {
+                ctx.fillText(lines[i], canvas.width / 2, startY + i * lineHeight);
+            }
+            
+            // رسم اسم الكاتب
+            var authorY = startY + lines.length * lineHeight + fontSize;
+            ctx.font = 'italic ' + (fontSize * 0.6) + 'px Arial';
+            ctx.fillText('— ' + quote.author, canvas.width / 2, authorY);
+            
+            // تحميل الصورة
+            var link = document.createElement('a');
+            link.download = 'quote-' + quote.id + '-' + option.name.replace(/\s+/g, '-') + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        },
+        
+        drawBackground: function(ctx, width, height, bg) {
+            if (bg.type === 'gradient') {
+                var gradient = ctx.createLinearGradient(0, 0, width, height);
+                for (var i = 0; i < bg.colors.length; i++) {
+                    gradient.addColorStop(i / (bg.colors.length - 1), bg.colors[i]);
+                }
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+            } else if (bg.type === 'solid') {
+                ctx.fillStyle = bg.colors<span class="footnote-wrapper">[0](0)</span>;
+                ctx.fillRect(0, 0, width, height);
+            }
+            
+            // إضافة النمط إذا كان موجوداً
+            if (bg.pattern && bg.pattern !== 'none') {
+                this.drawPattern(ctx, width, height, bg.pattern, bg.colors);
+            }
+        },
+        
+        drawPattern: function(ctx, width, height, pattern, colors) {
+            ctx.save();
+            ctx.globalAlpha = 0.1;
+            
+            switch(pattern) {
+                case 'stripes-horizontal':
+                    for (var y = 0; y < height; y += 20) {
+                        ctx.fillStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#ffffff';
+                        ctx.fillRect(0, y, width, 10);
+                    }
+                    break;
+                case 'stripes-vertical':
+                    for (var x = 0; x < width; x += 20) {
+                        ctx.fillStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#ffffff';
+                        ctx.fillRect(x, 0, 10, height);
+                    }
+                    break;
+                case 'stripes-diagonal':
+                    ctx.strokeStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#ffffff';
+                    ctx.lineWidth = 5;
+                    for (var i = -height; i < width + height; i += 30) {
+                        ctx.beginPath();
+                        ctx.moveTo(i, 0);
+                        ctx.lineTo(i + height, height);
+                        ctx.stroke();
+                    }
+                    break;
+                case 'dots':
+                    ctx.fillStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#ffffff';
+                    for (var dx = 0; dx < width; dx += 30) {
+                        for (var dy = 0; dy < height; dy += 30) {
+                            ctx.beginPath();
+                            ctx.arc(dx, dy, 3, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                    break;
+                case 'dots-small':
+                    ctx.fillStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#ffffff';
+                    for (var sx = 0; sx < width; sx += 15) {
+                        for (var sy = 0; sy < height; sy += 15) {
+                            ctx.beginPath();
+                            ctx.arc(sx, sy, 1.5, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                    break;
+                case 'dots-large':
+                    ctx.fillStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#ffffff';
+                    for (var lx = 0; lx < width; lx += 50) {
+                        for (var ly = 0; ly < height; ly += 50) {
+                            ctx.beginPath();
+                            ctx.arc(lx, ly, 5, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                    break;
+                case 'triangles':
+                    ctx.fillStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#ffffff';
+                    var triSize = 40;
+                    for (var tx = 0; tx < width; tx += triSize) {
+                        for (var ty = 0; ty < height; ty += triSize) {
+                            ctx.beginPath();
+                            ctx.moveTo(tx, ty + triSize);
+                            ctx.lineTo(tx + triSize / 2, ty);
+                            ctx.lineTo(tx + triSize, ty + triSize);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                    break;
+                case 'circles':
+                    ctx.fillStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#ffffff';
+                    var circleSize = 25;
+                    for (var cx = 0; cx < width; cx += circleSize * 2) {
+                        for (var cy = 0; cy < height; cy += circleSize * 2) {
+                            ctx.beginPath();
+                            ctx.arc(cx, cy, circleSize, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                    break;
+                case 'hexagons':
+                    ctx.strokeStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#ffffff';
+                    ctx.lineWidth = 2;
+                    var hexSize = 30;
+                    for (var hx = 0; hx < width; hx += hexSize * 1.5) {
+                        for (var hy = 0; hy < height; hy += hexSize * 1.73) {
+                            this.drawHexagon(ctx, hx, hy, hexSize);
+                        }
+                    }
+                    break;
+                case 'marble':
+                    // محاكاة الرخام بنمط عشوائي
+                    ctx.fillStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#cccccc';
+                    for (var m = 0; m < 50; m++) {
+                        var mx = Math.random() * width;
+                        var my = Math.random() * height;
+                        ctx.beginPath();
+                        ctx.arc(mx, my, Math.random() * 30 + 10, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    break;
+                case 'wood':
+                    // محاكاة الخشب بخطوط أفقية
+                    ctx.strokeStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#8B4513';
+                    ctx.lineWidth = 2;
+                    for (var wy = 0; wy < height; wy += 15) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, wy + Math.random() * 5);
+                        for (var wx = 0; wx < width; wx += 10) {
+                            ctx.lineTo(wx, wy + Math.sin(wx * 0.1) * 3 + Math.random() * 2);
+                        }
+                        ctx.stroke();
+                    }
+                    break;
+                case 'floral-small':
+                    ctx.fillStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#ff69b4';
+                    var flowerSize = 15;
+                    for (var fx = 0; fx < width; fx += flowerSize * 3) {
+                        for (var fy = 0; fy < height; fy += flowerSize * 3) {
+                            this.drawFlower(ctx, fx, fy, flowerSize);
+                        }
+                    }
+                    break;
+                case 'floral-large':
+                    ctx.fillStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#ff69b4';
+                    var largeFlowerSize = 30;
+                    for (var lfx = 0; lfx < width; lfx += largeFlowerSize * 3) {
+                        for (var lfy = 0; lfy < height; lfy += largeFlowerSize * 3) {
+                            this.drawFlower(ctx, lfx, lfy, largeFlowerSize);
+                        }
+                    }
+                    break;
+                case 'islamic':
+                    // زخرفة إسلامية بسيطة
+                    ctx.strokeStyle = colors<span class="footnote-wrapper">[1](1) </span>|| '#FFD700';
+                    ctx.lineWidth = 2;
+                    var islamicSize = 50;
+                    for (var ix = 0; ix < width; ix += islamicSize) {
+                        for (var iy = 0; iy < height; iy += islamicSize) {
+                            ctx.beginPath();
+                            ctx.arc(ix, iy, islamicSize / 2, 0, Math.PI * 2);
+                            ctx.stroke();
+                            ctx.beginPath();
+                            ctx.arc(ix + islamicSize / 2, iy, islamicSize / 4, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                    }
+                    break;
+            }
+            
+            ctx.restore();
+        },
+        
+        drawHexagon: function(ctx, x, y, size) {
+            ctx.beginPath();
+            for (var i = 0; i < 6; i++) {
+                var angle = (Math.PI / 3) * i - Math.PI / 6;
+                var hx = x + size * Math.cos(angle);
+                var hy = y + size * Math.sin(angle);
+                if (i === 0) {
+                    ctx.moveTo(hx, hy);
+                } else {
+                    ctx.lineTo(hx, hy);
+                }
+            }
+            ctx.closePath();
+            ctx.stroke();
+        },
+        
+        drawFlower: function(ctx, x, y, size) {
+                    drawFlower: function(ctx, x, y, size) {
+            // رسم بتلات الزهرة
+            var petalCount = 5;
+            var petalSize = size * 0.4;
+            
+            for (var i = 0; i < petalCount; i++) {
+                var angle = (Math.PI * 2 / petalCount) * i - Math.PI / 2;
+                var px = x + Math.cos(angle) * petalSize;
+                var py = y + Math.sin(angle) * petalSize;
+                
                 ctx.beginPath();
-                ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+                ctx.ellipse(px, py, petalSize, petalSize * 0.6, angle, 0, Math.PI * 2);
                 ctx.fill();
             }
+            
+            // رسم مركز الزهرة
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(x, y, size * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+        },
+        
+        // ============================================
+        // دوال تقسيم النص
+        // ============================================
+        wrapText: function(ctx, text, maxWidth) {
+            var words = text.split(' ');
+            var lines = [];
+            var currentLine = '';
+            
+            for (var i = 0; i < words.length; i++) {
+                var testLine = currentLine + words[i] + ' ';
+                var metrics = ctx.measureText(testLine);
+                var testWidth = metrics.width;
+                
+                if (testWidth > maxWidth && i > 0) {
+                    lines.push(currentLine.trim());
+                    currentLine = words[i] + ' ';
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            
+            lines.push(currentLine.trim());
+            return lines;
+        },
+        
+        // ============================================
+        // دوال المشاركة
+        // ============================================
+        shareQuote: function() {
+            var currentQuote = quotes[this.currentIndex];
+            var shareText = currentQuote.text + '\n\n— ' + currentQuote.author;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'قول الإمام علي',
+                    text: shareText
+                }).catch(function(error) {
+                    console.error('Share failed:', error);
+                });
+            } else {
+                // نسخ النص للحافظة كبديل
+                navigator.clipboard.writeText(shareText).then(function() {
+                    alert('تم نسخ القول!');
+                }).catch(function(error) {
+                    console.error('Copy failed:', error);
+                });
+            }
+        },
+        
+        // ============================================
+        // دوال تحديث واجهة المستخدم
+        // ============================================
+        updateUI: function() {
+            var favBtn = document.getElementById('favorite-btn');
+            if (favBtn) {
+                favBtn.textContent = this.isCurrentFavorite() ? '★' : '☆';
+                favBtn.classList.toggle('active', this.isCurrentFavorite());
+            }
+            
+            var darkModeBtn = document.getElementById('dark-mode-btn');
+            if (darkModeBtn) {
+                darkModeBtn.textContent = this.isDarkMode ? '☀️' : '🌙';
+            }
+            
+            // تحديث معلومات التحميل
+            var downloadInfo = document.getElementById('download-info');
+            if (downloadInfo) {
+                var option = downloadOptions[this.selectedDownload];
+                downloadInfo.textContent = option.name + ' (' + option.dims + ')';
+            }
+        },
+        
+        // ============================================
+        // إعداد مستمعي الأحداث
+        // ============================================
+        setupEventListeners: function() {
+            var self = this;
+            
+            // أزرار التنقل
+            var prevBtn = document.getElementById('prev-btn');
+            var nextBtn = document.getElementById('next-btn');
+            var randomBtn = document.getElementById('random-btn');
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    self.prevQuote();
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    self.nextQuote();
+                });
+            }
+            
+            if (randomBtn) {
+                randomBtn.addEventListener('click', function() {
+                    self.randomQuote();
+                });
+            }
+            
+            // زر المفضلة
+            var favBtn = document.getElementById('favorite-btn');
+            if (favBtn) {
+                favBtn.addEventListener('click', function() {
+                    self.toggleFavorite();
+                });
+            }
+            
+            // زر المشاركة
+            var shareBtn = document.getElementById('share-btn');
+            if (shareBtn) {
+                shareBtn.addEventListener('click', function() {
+                    self.shareQuote();
+                });
+            }
+            
+            // زر الوضع الليلي
+            var darkModeBtn = document.getElementById('dark-mode-btn');
+            if (darkModeBtn) {
+                darkModeBtn.addEventListener('click', function() {
+                    self.toggleDarkMode();
+                });
+            }
+            
+            // زر التحميل
+            var downloadBtn = document.getElementById('download-btn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function() {
+                    self.downloadQuote();
+                });
+            }
+            
+            // أزرار حجم الخط
+            var increaseFontBtn = document.getElementById('increase-font-btn');
+            var decreaseFontBtn = document.getElementById('decrease-font-btn');
+            
+            if (increaseFontBtn) {
+                increaseFontBtn.addEventListener('click', function() {
+                    self.changeFontSize('increase');
+                });
+            }
+            
+            if (decreaseFontBtn) {
+                decreaseFontBtn.addEventListener('click', function() {
+                    self.changeFontSize('decrease');
+                });
+            }
+            
+            // البحث
+            var searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    var results = self.searchQuotes(this.value);
+                    self.displaySearchResults(results);
+                });
+            }
+            
+            // التنقل بلوحة المفاتيح
+            document.addEventListener('keydown', function(event) {
+                self.handleKeyboard(event);
+            });
+        },
+        
+        // ============================================
+        // التنقل بلوحة المفاتيح
+        // ============================================
+        handleKeyboard: function(event) {
+            switch(event.key) {
+                case 'ArrowLeft':
+                    this.prevQuote();
+                    break;
+                case 'ArrowRight':
+                    this.nextQuote();
+                    break;
+                case ' ':
+                    event.preventDefault();
+                    this.randomQuote();
+                    break;
+                case 'f':
+                case 'F':
+                    this.toggleFavorite();
+                    break;
+                case 'd':
+                case 'D':
+                    this.toggleDarkMode();
+                    break;
+                case 's':
+                case 'S':
+                    this.downloadQuote();
+                    break;
+            }
+        },
+        
+        // ============================================
+        // عرض نتائج البحث
+        // ============================================
+        displaySearchResults: function(results) {
+            var resultsContainer = document.getElementById('search-results');
+            if (!resultsContainer) return;
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<p class="no-results">لا توجد نتائج</p>';
+                return;
+            }
+            
+            var html = '';
+            for (var i = 0; i < results.length; i++) {
+                html += '<div class="search-result-item" data-index="' + results[i].id + '">';
+                html += '<p class="result-text">' + results[i].text + '</p>';
+                html += '<span class="result-category">' + results[i].category + '</span>';
+                html += '</div>';
+            }
+            
+            resultsContainer.innerHTML = html;
+            
+            // إضافة مستمعي الأحداث لنتائج البحث
+            var self = this;
+            var resultItems = resultsContainer.querySelectorAll('.search-result-item');
+            resultItems.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    var index = parseInt(this.getAttribute('data-index')) - 1;
+                    self.goToQuote(index);
+                });
+            });
+        },
+        
+        // ============================================
+        // دوال إحصائية
+        // ============================================
+        getStats: function() {
+            return {
+                totalQuotes: quotes.length,
+                totalFavorites: this.favorites.length,
+                totalHistory: this.history.length,
+                currentIndex: this.currentIndex,
+                selectedBackground: backgrounds[this.selectedBg].name,
+                selectedDownload: downloadOptions[this.selectedDownload].name
+            };
         }
-        
-        // إضافة تأثيرات ضوئية
-        for (var i=0;i<6;i++) {
-            var x=Math.random()*canvas.width, y=Math.random()*canvas.height, r=Math.min(canvas.width,canvas.height)*0.15;
-            var cg=ctx.createRadialGradient(x,y,0,x,y,r);
-            cg.addColorStop(0,'rgba(212,168,67,0.04)'); cg.addColorStop(1,'rgba(212,168,67,0)');
-            ctx.fillStyle=cg; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-        }
-        
-        // إطار زخرفي
-        var margin = Math.min(canvas.width, canvas.height) * 0.05;
-        ctx.strokeStyle='rgba(212,168,67,0.12)'; ctx.lineWidth=3; ctx.strokeRect(margin,margin,canvas.width-margin*2,canvas.height-margin*2);
-        ctx.strokeStyle='rgba(212,168,67,0.06)'; ctx.lineWidth=1; ctx.strokeRect(margin*1.5,margin*1.5,canvas.width-margin*3,canvas.height-margin*3);
-        
-        // عنوان
-        var titleSize = Math.min(canvas.width, canvas.height) * 0.035;
-        ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=20;
-        ctx.fillStyle='rgba(212,168,67,0.5)'; ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.font=titleSize+'px "Amiri", serif';
-        ctx.fillText('قال الإمام علي (عليه السلام)',canvas.width/2,canvas.height * 0.1);
-        
-        // خلفية النص
-        var textMarginX = canvas.width * 0.1;
-        var textMarginY = canvas.height * 0.18;
-        var textWidth = canvas.width - textMarginX * 2;
-        var textHeight = canvas.height * 0.6;
-        ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=60; ctx.shadowOffsetX=0; ctx.shadowOffsetY=10;
-        ctx.fillStyle='rgba(255,255,255,0.04)';
-        roundRect(ctx, textMarginX, textMarginY, textWidth, textHeight, Math.min(canvas.width,canvas.height)*0.03);
-        ctx.fill();
-        ctx.shadowColor='transparent'; ctx.strokeStyle='rgba(212,168,67,0.1)'; ctx.lineWidth=2;
-        roundRect(ctx, textMarginX, textMarginY, textWidth, textHeight, Math.min(canvas.width,canvas.height)*0.03);
-        ctx.stroke();
-        
-        // النص
-        ctx.shadowColor='rgba(0,0,0,0.4)'; ctx.shadowBlur=25;
-        ctx.fillStyle='#f5f0e8'; ctx.textAlign='center'; ctx.textBaseline='middle';
-        
-        var maxTextWidth = textWidth - canvas.width * 0.06;
-        var tl = quote.text.length;
-        var bfs;
-        if (size.name === 'ملصق شفاف') bfs = Math.min(canvas.width, canvas.height) * 0.08;
-        else if (tl <= 30) bfs = Math.min(canvas.width, canvas.height) * 0.06;
-        else if (tl <= 50) bfs = Math.min(canvas.width, canvas.height) * 0.05;
-        else if (tl <= 80) bfs = Math.min(canvas.width, canvas.height) * 0.04;
-        else if (tl <= 120) bfs = Math.min(canvas.width, canvas.height) * 0.035;
-        else bfs = Math.min(canvas.width, canvas.height) * 0.03;
-        
-        ctx.font=bfs+'px "Amiri", serif';
-        
-        var words=quote.text.split(' '), lines=[], cl='';
-        for (var w=0;w<words.length;w++) {
-            var tl2=cl+' '+words[w], m=ctx.measureText(tl2);
-            if (m.width>maxTextWidth&&cl!==''){lines.push(cl);cl=words[w];}else{cl=tl2;}
-        }
-        lines.push(cl);
-        
-        var lh=bfs*1.8;
-        var startY = textMarginY + textHeight/2 - (lines.length-1)*lh/2;
-        ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=30;
-        
-     for (var l = 0; l < lines.length; l++) {
-    ctx.fillText(lines[l], canvas.width / 2, startY + l * lh);
-}
-
-        for (var l = 0; l < lines.length; l++) {
-            ctx.fillText(lines[l], canvas.width / 2, startY + l * lh);
-        }
-        
-        // توقيع
-        var signSize = Math.min(canvas.width, canvas.height) * 0.025;
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.shadowBlur = 10;
-        ctx.fillStyle = 'rgba(212,168,67,0.4)';
-        ctx.font = signSize + 'px "Amiri", serif';
-        ctx.fillText('— موقع أقوال الإمام علي (عليه السلام)', canvas.width / 2, canvas.height * 0.88);
-        
-        // تحويل اللوحة إلى صورة وتحميلها
-        var link = document.createElement('a');
-        link.download = 'imam-ali-quote-' + (currentIndex + 1) + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        
-        showToast('تم تحميل الصورة بنجاح');
-    }
+    };
     
-    // دالة مساعدة لرسم مستطيل بزوايا دائرية
-    function roundRect(ctx, x, y, w, h, r) {
-        ctx.beginPath();
-        ctx.moveTo(x + r, y);
-        ctx.lineTo(x + w - r, y);
-        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-        ctx.lineTo(x + w, y + h - r);
-        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        ctx.lineTo(x + r, y + h);
-        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-        ctx.lineTo(x, y + r);
-        ctx.quadraticCurveTo(x, y, x + r, y);
-        ctx.closePath();
-    }
-    
-    // دالة عرض الإشعارات (Toast)
-    function showToast(message) {
-        var toast = document.getElementById('toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast';
-            toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:#f5f0e8;padding:12px 24px;border-radius:8px;font-family:"Amiri",serif;font-size:1.1em;z-index:10000;opacity:0;transition:opacity 0.3s ease;pointer-events:none;border:1px solid rgba(212,168,67,0.3);';
-            document.body.appendChild(toast);
-        }
-        toast.textContent = message;
-        toast.style.opacity = '1';
-        setTimeout(function() {
-            toast.style.opacity = '0';
-        }, 2000);
-    }
-    
-    // تشغيل التطبيق عند تحميل الصفحة
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    // ============================================
+    // تشغيل المحرك عند تحميل الصفحة
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        engine.init();
+    });
     
 })();
+
