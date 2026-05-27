@@ -7,17 +7,28 @@
     var selectedBg = 0;
     var timerInterval = null;
     
+    // 20 تشكيل ألوان للخلفيات
     var backgrounds = [
-        { name: 'ذهبي كلاسيك', colors: ['#0a0505','#1a0a05','#0a0510','#000000'], type: 'dark' },
-        { name: 'أزرق ليلي', colors: ['#050a15','#0a1530','#051020','#000510'], type: 'dark' },
-        { name: 'أخضر زمردي', colors: ['#050a08','#0a1a10','#051008','#000a05'], type: 'dark' },
-        { name: 'بنفسجي ملكي', colors: ['#0a0515','#150a25','#0a0510','#05000a'], type: 'dark' },
-        { name: 'أحمر غامق', colors: ['#150505','#250a0a','#100505','#0a0000'], type: 'dark' },
-        { name: 'وردي ناعم', colors: ['#1a0a15','#2a1520','#150a10','#0a0508'], type: 'feminine' },
-        { name: 'لافندر', colors: ['#1a0a20','#2a1530','#150a18','#0a050e'], type: 'feminine' },
-        { name: 'بيج فاتح', colors: ['#1a1510','#2a2018','#15100a','#0a0805'], type: 'feminine' },
-        { name: 'سماوي', colors: ['#0a1520','#102030','#081018','#050a10'], type: 'feminine' },
-        { name: 'كحلي أنيق', colors: ['#050a15','#0a1025','#050810','#00050a'], type: 'dark' }
+        { name: 'ذهبي كلاسيك', colors: ['#0a0505','#1a0a05','#0a0510','#000000'] },
+        { name: 'أزرق ليلي', colors: ['#050a15','#0a1530','#051020','#000510'] },
+        { name: 'أخضر زمردي', colors: ['#050a08','#0a1a10','#051008','#000a05'] },
+        { name: 'بنفسجي ملكي', colors: ['#0a0515','#150a25','#0a0510','#05000a'] },
+        { name: 'أحمر غامق', colors: ['#150505','#250a0a','#100505','#0a0000'] },
+        { name: 'وردي ناعم', colors: ['#1a0a15','#2a1520','#150a10','#0a0508'] },
+        { name: 'لافندر', colors: ['#1a0a20','#2a1530','#150a18','#0a050e'] },
+        { name: 'بيج فاتح', colors: ['#1a1510','#2a2018','#15100a','#0a0805'] },
+        { name: 'سماوي', colors: ['#0a1520','#102030','#081018','#050a10'] },
+        { name: 'كحلي أنيق', colors: ['#050a15','#0a1025','#050810','#00050a'] },
+        { name: 'خزامي', colors: ['#150a20','#201030','#100818','#080510'] },
+        { name: 'عسلي', colors: ['#1a1005','#2a1a0a','#150a05','#0a0500'] },
+        { name: 'نعناعي', colors: ['#051a10','#0a2a1a','#051508','#000a05'] },
+        { name: 'مرجاني', colors: ['#1a0a0a','#2a1510','#150808','#0a0505'] },
+        { name: 'نيلي', colors: ['#050515','#0a0a25','#050518','#000010'] },
+        { name: 'ذهبي وردي', colors: ['#1a0a10','#2a1518','#150a0e','#0a0508'] },
+        { name: 'فضي', colors: ['#0a0a0a','#1a1a1a','#101010','#050505'] },
+        { name: 'كستنائي', colors: ['#150505','#250a08','#100505','#080000'] },
+        { name: 'تركواز', colors: ['#051515','#0a2020','#081515','#051010'] },
+        { name: 'بني', colors: ['#150a05','#201008','#100805','#080500'] }
     ];
     
     function init() {
@@ -29,12 +40,12 @@
         }
         
         initParticles();
-        initBgOptions();
+        initBgGrid();
         
         document.getElementById('shuffleBtn').addEventListener('click', shuffleQuote);
         document.getElementById('prevBtn').addEventListener('click', prevQuote);
         document.getElementById('nextBtn').addEventListener('click', nextQuote);
-        document.getElementById('saveBtn').addEventListener('click', saveAsImage);
+        document.getElementById('saveBtn').addEventListener('click', openSaveModal);
         document.getElementById('shareBtn').addEventListener('click', shareQuote);
         document.getElementById('allQuotesBtn').addEventListener('click', openAllQuotes);
         document.getElementById('aboutBtn').addEventListener('click', openAbout);
@@ -42,6 +53,8 @@
         document.getElementById('closeAllQuotes').addEventListener('click', closeAllQuotes);
         document.getElementById('closeAbout').addEventListener('click', closeAbout);
         document.getElementById('closeSettings').addEventListener('click', closeSettings);
+        document.getElementById('closeSave').addEventListener('click', closeSaveModal);
+        document.getElementById('confirmSave').addEventListener('click', saveAsImage);
         document.getElementById('searchInput').addEventListener('input', searchQuotes);
         document.getElementById('fontSizeSelect').addEventListener('change', changeFontSize);
         document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
@@ -67,21 +80,20 @@
         }, {passive: true});
     }
     
-    function initBgOptions() {
-        var container = document.getElementById('bgOptions');
-        container.innerHTML = '';
+    function initBgGrid() {
+        var grid = document.getElementById('bgGrid');
+        grid.innerHTML = '';
         for (var i = 0; i < backgrounds.length; i++) {
             (function(idx) {
                 var div = document.createElement('div');
-                div.className = 'bg-option' + (idx === selectedBg ? ' selected' : '');
-                div.innerHTML = '<div class="bg-preview" style="background: linear-gradient(135deg, ' + backgrounds[idx].colors.join(',') + ');"></div>' + backgrounds[idx].name;
+                div.className = 'bg-grid-item' + (idx === selectedBg ? ' selected' : '');
+                div.innerHTML = '<div class="preview" style="background: linear-gradient(135deg, ' + backgrounds[idx].colors.join(',') + ');"></div><div class="name">' + backgrounds[idx].name + '</div>';
                 div.addEventListener('click', function() {
-                    document.querySelectorAll('.bg-option').forEach(function(el) { el.classList.remove('selected'); });
+                    document.querySelectorAll('.bg-grid-item').forEach(function(el) { el.classList.remove('selected'); });
                     div.classList.add('selected');
                     selectedBg = idx;
-                    showToast('تم اختيار خلفية: ' + backgrounds[idx].name);
                 });
-                container.appendChild(div);
+                grid.appendChild(div);
             })(i);
         }
     }
@@ -222,6 +234,8 @@
     function closeAbout() { document.getElementById('aboutModal').classList.remove('active'); }
     function openSettings() { document.getElementById('settingsModal').classList.add('active'); }
     function closeSettings() { document.getElementById('settingsModal').classList.remove('active'); }
+    function openSaveModal() { document.getElementById('saveModal').classList.add('active'); }
+    function closeSaveModal() { document.getElementById('saveModal').classList.remove('active'); }
     
     function displayAllQuotes(arr) {
         var list = document.getElementById('quotesList');
@@ -253,7 +267,7 @@
     function shareQuote() {
         var quote = quotes[currentIndex];
         if (!quote) return;
-        var text = '📜 قال الإمام علي (عليه السلام):\n\n' + quote.text + '\n\n— موقع أقوال الإمام علي';
+        var text = 'قال الإمام علي (عليه السلام):\n\n' + quote.text + '\n\n— موقع أقوال الإمام علي';
         var url = window.location.href;
         
         if (navigator.share) {
@@ -274,6 +288,8 @@
     function saveAsImage() {
         var quote = quotes[currentIndex];
         if (!quote) return;
+        closeSaveModal();
+        
         var canvas = document.getElementById('imageCanvas');
         var ctx = canvas.getContext('2d');
         canvas.width = 2160; canvas.height = 3840;
