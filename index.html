@@ -392,6 +392,18 @@
             .btn { font-size: 0.7em; padding: 8px 10px; min-width: 60px; }
             .bg-grid { grid-template-columns: repeat(2, 1fr); }
         }
+    
+    @font-face { font-family: 'ThmanyahSans'; src: url('fonts/thmanyahsans12_regular.otf'); }
+    @font-face { font-family: 'ThmanyahSerif'; src: url('fonts/thmanyahseriftext12_regular.otf'); }
+    @font-face { font-family: 'ThmanyahDisplay'; src: url('fonts/thmanyahserifdisplay12_regular.otf'); }
+    
+    .quote-text { font-family: 'ThmanyahSerif', serif !important; }
+    .quote-mark { font-family: 'Amiri', serif !important; color: #d4a843; font-size: 1.2em; }
+
+    @font-face { font-family: 'ThmanyahSerif'; src: url('fonts/thmanyahseriftext12_regular.otf') format('opentype'); }
+    @font-face { font-family: 'ThmanyahDisplay'; src: url('fonts/thmanyahserifdisplay12_regular.otf') format('opentype'); }
+    @font-face { font-family: 'ThmanyahSans'; src: url('fonts/thmanyahsans12_regular.otf') format('opentype'); }
+
     </style>
 </head>
 <body>
@@ -403,9 +415,9 @@
         </header>
         <div class="quote-card" id="quoteCard">
             <div class="quote-text">
-                <span class="quote-mark">&#xFD3F;</span>
+                <span class="quote-mark">﴿</span>
                 <span id="quoteContent">جارٍ التحميل...</span>
-                <span class="quote-mark">&#xFD3E;</span>
+                <span class="quote-mark">﴾</span>
             </div>
         </div>
         <div class="controls">
@@ -509,6 +521,8 @@
                     <option value="60">دقيقة</option>
                 </select>
             </div>
+            
+
         </div>
     </div>
 
@@ -542,6 +556,7 @@
     <div id="toast" class="toast"></div>
 
     <script src="quotes.js"></script>
+    <script src="extra_quotes.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

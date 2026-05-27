@@ -503,8 +503,9 @@
         
         if (!format.transparent) {
             var sigSize = Math.floor(canvas.width * 0.02);
-            ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font=sigSize+'px "Amiri", serif';
-            ctx.fillText('— ne_7u —', canvas.width/2, canvas.height-padding);
+            ctx.fillStyle='rgba(255,255,255,0.2)'; 
+            ctx.font=sigSize+'px Arial, sans-serif';
+            ctx.fillText('insta : ne_7u', canvas.width/2, canvas.height-padding);
         }
     }
     
@@ -530,8 +531,21 @@
         var ctx = canvas.getContext('2d');
         canvas.width = format.width; canvas.height = format.height;
         
-        var stream = canvas.captureStream(30);
-        var recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+        // إعداد الصوت
+        var audio = new Audio('audio.ogg');
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var source = audioCtx.createMediaElementSource(audio);
+        var dest = audioCtx.createMediaStreamDestination();
+        source.connect(dest);
+        source.connect(audioCtx.destination);
+        
+        var canvasStream = canvas.captureStream(30);
+        var combinedStream = new MediaStream([
+            ...canvasStream.getVideoTracks(),
+            ...dest.stream.getAudioTracks()
+        ]);
+        
+        var recorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm;codecs=vp9' });
         var chunks = [];
         
         recorder.ondataavailable = e => chunks.push(e.data);
@@ -546,19 +560,23 @@
         };
         
         var frame = 0;
+        var maxFrames = 300; // 10 ثواني بمعدل 30 إطار
         function recordFrame() {
-            if (frame < 300) { // 10 ثواني بمعدل 30 إطار
+            if (frame < maxFrames) {
                 drawQuoteOnCanvas(ctx, canvas, quote, format, frame);
                 frame++;
                 requestAnimationFrame(recordFrame);
             } else {
                 recorder.stop();
+                audio.pause();
+                audio.currentTime = 0;
             }
         }
         
         recorder.start();
+        audio.play();
         recordFrame();
-        showToast('جاري معالجة الفيديو (10 ثواني)...');
+        showToast('جاري معالجة الفيديو مع الصوت (10 ثواني)...');
     }
     
     function roundRect(ctx,x,y,w,h,r) {
@@ -577,3 +595,10 @@
     
     if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
+
+// دمج أشعار الديوان مع الأقوال الأصلية
+if (typeof extraQuotesData !== 'undefined' && Array.isArray(extraQuotesData)) {
+    quotes = quotes.concat(extraQuotesData);
+    console.log('✓ تم دمج أشعار الديوان (' + extraQuotesData.length + ' قول جديد)');
+}
+
