@@ -4,6 +4,21 @@
     var currentIndex = 0;
     var quotes = [];
     var fontSizeMultiplier = 1;
+    var selectedBg = 0;
+    var timerInterval = null;
+    
+    var backgrounds = [
+        { name: 'ذهبي كلاسيك', colors: ['#0a0505','#1a0a05','#0a0510','#000000'], type: 'dark' },
+        { name: 'أزرق ليلي', colors: ['#050a15','#0a1530','#051020','#000510'], type: 'dark' },
+        { name: 'أخضر زمردي', colors: ['#050a08','#0a1a10','#051008','#000a05'], type: 'dark' },
+        { name: 'بنفسجي ملكي', colors: ['#0a0515','#150a25','#0a0510','#05000a'], type: 'dark' },
+        { name: 'أحمر غامق', colors: ['#150505','#250a0a','#100505','#0a0000'], type: 'dark' },
+        { name: 'وردي ناعم', colors: ['#1a0a15','#2a1520','#150a10','#0a0508'], type: 'feminine' },
+        { name: 'لافندر', colors: ['#1a0a20','#2a1530','#150a18','#0a050e'], type: 'feminine' },
+        { name: 'بيج فاتح', colors: ['#1a1510','#2a2018','#15100a','#0a0805'], type: 'feminine' },
+        { name: 'سماوي', colors: ['#0a1520','#102030','#081018','#050a10'], type: 'feminine' },
+        { name: 'كحلي أنيق', colors: ['#050a15','#0a1025','#050810','#00050a'], type: 'dark' }
+    ];
     
     function init() {
         if (typeof quotesData !== 'undefined' && quotesData.length > 0) {
@@ -14,11 +29,13 @@
         }
         
         initParticles();
+        initBgOptions();
         
         document.getElementById('shuffleBtn').addEventListener('click', shuffleQuote);
         document.getElementById('prevBtn').addEventListener('click', prevQuote);
         document.getElementById('nextBtn').addEventListener('click', nextQuote);
         document.getElementById('saveBtn').addEventListener('click', saveAsImage);
+        document.getElementById('shareBtn').addEventListener('click', shareQuote);
         document.getElementById('allQuotesBtn').addEventListener('click', openAllQuotes);
         document.getElementById('aboutBtn').addEventListener('click', openAbout);
         document.getElementById('settingsBtn').addEventListener('click', openSettings);
@@ -29,6 +46,7 @@
         document.getElementById('fontSizeSelect').addEventListener('change', changeFontSize);
         document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
         document.getElementById('minimalModeToggle').addEventListener('click', toggleMinimalMode);
+        document.getElementById('timerSelect').addEventListener('change', toggleTimer);
         
         window.addEventListener('click', function(e) {
             if (e.target.classList.contains('modal')) e.target.classList.remove('active');
@@ -47,6 +65,25 @@
             var diff = touchStartX - touchEndX;
             if (Math.abs(diff) > 50) { if (diff > 0) nextQuote(); else prevQuote(); }
         }, {passive: true});
+    }
+    
+    function initBgOptions() {
+        var container = document.getElementById('bgOptions');
+        container.innerHTML = '';
+        for (var i = 0; i < backgrounds.length; i++) {
+            (function(idx) {
+                var div = document.createElement('div');
+                div.className = 'bg-option' + (idx === selectedBg ? ' selected' : '');
+                div.innerHTML = '<div class="bg-preview" style="background: linear-gradient(135deg, ' + backgrounds[idx].colors.join(',') + ');"></div>' + backgrounds[idx].name;
+                div.addEventListener('click', function() {
+                    document.querySelectorAll('.bg-option').forEach(function(el) { el.classList.remove('selected'); });
+                    div.classList.add('selected');
+                    selectedBg = idx;
+                    showToast('تم اختيار خلفية: ' + backgrounds[idx].name);
+                });
+                container.appendChild(div);
+            })(i);
+        }
     }
     
     function initParticles() {
@@ -165,6 +202,17 @@
         showToast(container.classList.contains('minimal-mode') ? 'تم إخفاء العناصر' : 'تم إظهار العناصر');
     }
     
+    function toggleTimer() {
+        var val = parseInt(document.getElementById('timerSelect').value);
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        if (val > 0) {
+            timerInterval = setInterval(function() { nextQuote(); }, val * 1000);
+            showToast('تم تفعيل المؤقت التلقائي كل ' + val + ' ثواني');
+        } else {
+            showToast('تم إيقاف المؤقت التلقائي');
+        }
+    }
+    
     function shuffleQuote() { showQuote(Math.floor(Math.random()*quotes.length)); showToast('تم اختيار قول عشوائي'); }
     function prevQuote() { showQuote(currentIndex-1); }
     function nextQuote() { showQuote(currentIndex+1); }
@@ -191,7 +239,6 @@
     
     function searchQuotes() {
         var term = this.value.toLowerCase();
-        // إزالة الحركات للبحث
         var termClean = term.replace(/[ًٌٍَُِّْ]/g, '');
         var filtered = [];
         for (var i=0;i<quotes.length;i++) {
@@ -203,6 +250,27 @@
         displayAllQuotes(filtered);
     }
     
+    function shareQuote() {
+        var quote = quotes[currentIndex];
+        if (!quote) return;
+        var text = '📜 قال الإمام علي (عليه السلام):\n\n' + quote.text + '\n\n— موقع أقوال الإمام علي';
+        var url = window.location.href;
+        
+        if (navigator.share) {
+            navigator.share({ title: 'أقوال الإمام علي', text: text, url: url })
+                .then(function() { showToast('تم المشاركة بنجاح'); })
+                .catch(function() { showToast('تم إلغاء المشاركة'); });
+        } else {
+            var textarea = document.createElement('textarea');
+            textarea.value = text + '\n' + url;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('تم نسخ النص للمشاركة');
+        }
+    }
+    
     function saveAsImage() {
         var quote = quotes[currentIndex];
         if (!quote) return;
@@ -210,19 +278,23 @@
         var ctx = canvas.getContext('2d');
         canvas.width = 2160; canvas.height = 3840;
         
+        var bg = backgrounds[selectedBg];
         var grad = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
-        grad.addColorStop(0,'#0a0505'); grad.addColorStop(0.3,'#1a0a05'); grad.addColorStop(0.6,'#0a0510'); grad.addColorStop(1,'#000000');
+        grad.addColorStop(0, bg.colors[0]);
+        grad.addColorStop(0.3, bg.colors[1]);
+        grad.addColorStop(0.6, bg.colors[2]);
+        grad.addColorStop(1, bg.colors[3]);
         ctx.fillStyle = grad; ctx.fillRect(0,0,canvas.width,canvas.height);
         
-        for (var i=0;i<6;i++) {
-            var x=Math.random()*canvas.width, y=Math.random()*canvas.height, r=80+Math.random()*250;
+        for (var i=0;i<8;i++) {
+            var x=Math.random()*canvas.width, y=Math.random()*canvas.height, r=100+Math.random()*300;
             var cg=ctx.createRadialGradient(x,y,0,x,y,r);
-            cg.addColorStop(0,'rgba(212,168,67,0.04)'); cg.addColorStop(1,'rgba(212,168,67,0)');
+            cg.addColorStop(0,'rgba(212,168,67,0.03)'); cg.addColorStop(1,'rgba(212,168,67,0)');
             ctx.fillStyle=cg; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
         }
         
-        ctx.strokeStyle='rgba(212,168,67,0.12)'; ctx.lineWidth=3; ctx.strokeRect(100,100,canvas.width-200,canvas.height-200);
-        ctx.strokeStyle='rgba(212,168,67,0.06)'; ctx.lineWidth=1; ctx.strokeRect(140,140,canvas.width-280,canvas.height-280);
+        ctx.strokeStyle='rgba(212,168,67,0.1)'; ctx.lineWidth=3; ctx.strokeRect(100,100,canvas.width-200,canvas.height-200);
+        ctx.strokeStyle='rgba(212,168,67,0.05)'; ctx.lineWidth=1; ctx.strokeRect(140,140,canvas.width-280,canvas.height-280);
         
         ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=20;
         ctx.fillStyle='rgba(212,168,67,0.5)'; ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -231,11 +303,7 @@
         var cx=200, cy=600, cw=canvas.width-400, ch=canvas.height-1300;
         ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=80; ctx.shadowOffsetX=0; ctx.shadowOffsetY=15;
         ctx.fillStyle='rgba(255,255,255,0.04)'; roundRect(ctx,cx,cy,cw,ch,50); ctx.fill();
-        ctx.shadowColor='transparent'; ctx.strokeStyle='rgba(212,168,67,0.12)'; ctx.lineWidth=2; roundRect(ctx,cx,cy,cw,ch,50); ctx.stroke();
-        
-        ctx.fillStyle='rgba(212,168,67,0.18)'; ctx.font='90px "Amiri", serif';
-        ctx.textAlign='right'; ctx.fillText('\uFD3F',cx+cw-40,cy+120);
-        ctx.textAlign='left'; ctx.fillText('\uFD3E',cx+40,cy+ch-30);
+        ctx.shadowColor='transparent'; ctx.strokeStyle='rgba(212,168,67,0.1)'; ctx.lineWidth=2; roundRect(ctx,cx,cy,cw,ch,50); ctx.stroke();
         
         ctx.shadowColor='rgba(0,0,0,0.4)'; ctx.shadowBlur=25;
         ctx.fillStyle='#f5f0e8'; ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -252,10 +320,21 @@
         
         var lh=bfs*1.8, sy=cy+ch/2-(lines.length-1)*lh/2;
         ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=35;
-        for (var l=0;l<lines.length;l++) ctx.fillText(lines[l].trim(),canvas.width/2,sy+l*lh);
+        
+        for (var l=0;l<lines.length;l++) {
+            var lineText = lines[l].trim();
+            var lineWidth = ctx.measureText(lineText).width;
+            
+            ctx.fillStyle='rgba(212,168,67,0.25)'; ctx.font=(bfs*0.8)+'px "Amiri", serif';
+            ctx.textAlign='right'; ctx.fillText('\uFD3F', canvas.width/2 + lineWidth/2 + 20, sy+l*lh);
+            ctx.textAlign='left'; ctx.fillText('\uFD3E', canvas.width/2 - lineWidth/2 - 20, sy+l*lh);
+            
+            ctx.fillStyle='#f5f0e8'; ctx.font=bfs+'px "Amiri", serif';
+            ctx.textAlign='center'; ctx.fillText(lineText, canvas.width/2, sy+l*lh);
+        }
         
         ctx.shadowBlur=15; ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='30px "Amiri", serif';
-        ctx.fillText('\u2014 \u0633\u064A\u0641 \u0639\u0644\u064A \u2014',canvas.width/2,canvas.height-180);
+        ctx.textAlign='center'; ctx.fillText('\u2014 \u0633\u064A\u0641 \u0639\u0644\u064A \u2014',canvas.width/2,canvas.height-180);
         ctx.fillStyle='rgba(212,168,67,0.25)'; ctx.font='26px "Cairo", sans-serif';
         ctx.fillText('@ne_7u',canvas.width/2,canvas.height-120);
         
