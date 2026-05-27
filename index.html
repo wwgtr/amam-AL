@@ -512,13 +512,29 @@
         </div>
     </div>
 
-    <!-- نافذة اختيار الخلفية للحفظ -->
+    <!-- نافذة اختيار الخلفية والتنسيق للحفظ -->
     <div id="saveModal" class="modal">
         <div class="modal-content save-modal-content">
             <span class="close-btn" id="closeSave">&times;</span>
-            <h2>اختر خلفية الصورة</h2>
+            <h2>خيارات حفظ الصورة</h2>
+            
+            <div class="settings-group">
+                <label>اختر تنسيق التحميل</label>
+                <select id="formatSelect">
+                    <option value="hd">صورة عالية الدقة (2160×3840)</option>
+                    <option value="story">ستوري (1080×1920)</option>
+                    <option value="instagram">منشور انستقرام (1080×1080)</option>
+                    <option value="instagram_story">ستوري انستقرام (1080×1920)</option>
+                    <option value="telegram">منشور تلجرام (1280×720)</option>
+                    <option value="facebook">صورة فيسبوك (1200×628)</option>
+                    <option value="sticker">ملصق شفاف (1024×1024)</option>
+                    <option value="video_story">فيديو ستوري متحرك (10 ثواني)</option>
+                </select>
+            </div>
+            
+            <h3 style="color: #d4a843; margin-top: 20px; margin-bottom: 15px; font-size: 1.1em;">اختر خلفية الصورة</h3>
             <div class="bg-grid" id="bgGrid"></div>
-            <button id="confirmSave" class="save-btn-confirm">حفظ الصورة بهذه الخلفية</button>
+            <button id="confirmSave" class="save-btn-confirm">حفظ الصورة</button>
         </div>
     </div>
 
