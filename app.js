@@ -5,30 +5,68 @@
     var quotes = [];
     var fontSizeMultiplier = 1;
     var selectedBg = 0;
+    var selectedSize = 0;
     var timerInterval = null;
     
-    // 20 تشكيل ألوان للخلفيات
+    // مقاسات التحميل (9 خيارات)
+    var sizes = [
+        { name: 'ستوري', dims: '1080×1920', icon: '📱', w: 1080, h: 1920 },
+        { name: 'منشور انستا', dims: '1080×1080', icon: '📷', w: 1080, h: 1080 },
+        { name: 'بورترية انستا', dims: '1080×1350', icon: '🖼️', w: 1080, h: 1350 },
+        { name: 'منشور تلجرام', dims: '1200×630', icon: '✈️', w: 1200, h: 630 },
+        { name: 'ستوري تلجرام', dims: '1080×1920', icon: '📺', w: 1080, h: 1920 },
+        { name: 'منشور فيسبوك', dims: '1200×630', icon: '📘', w: 1200, h: 630 },
+        { name: 'ستوري فيسبوك', dims: '1080×1920', icon: '📖', w: 1080, h: 1920 },
+        { name: 'غلاف فيسبوك', dims: '851×315', icon: '🖌️', w: 851, h: 315 },
+        { name: 'ملصق شفاف', dims: '2000×2000', icon: '🏷️', w: 2000, h: 2000 }
+    ];
+    
+    // 40 خلفية متنوعة (عادية، مخططة، منقطة، هندسية، نجوم)
     var backgrounds = [
-        { name: 'ذهبي كلاسيك', colors: ['#0a0505','#1a0a05','#0a0510','#000000'] },
-        { name: 'أزرق ليلي', colors: ['#050a15','#0a1530','#051020','#000510'] },
-        { name: 'أخضر زمردي', colors: ['#050a08','#0a1a10','#051008','#000a05'] },
-        { name: 'بنفسجي ملكي', colors: ['#0a0515','#150a25','#0a0510','#05000a'] },
-        { name: 'أحمر غامق', colors: ['#150505','#250a0a','#100505','#0a0000'] },
-        { name: 'وردي ناعم', colors: ['#1a0a15','#2a1520','#150a10','#0a0508'] },
-        { name: 'لافندر', colors: ['#1a0a20','#2a1530','#150a18','#0a050e'] },
-        { name: 'بيج فاتح', colors: ['#1a1510','#2a2018','#15100a','#0a0805'] },
-        { name: 'سماوي', colors: ['#0a1520','#102030','#081018','#050a10'] },
-        { name: 'كحلي أنيق', colors: ['#050a15','#0a1025','#050810','#00050a'] },
-        { name: 'خزامي', colors: ['#150a20','#201030','#100818','#080510'] },
-        { name: 'عسلي', colors: ['#1a1005','#2a1a0a','#150a05','#0a0500'] },
-        { name: 'نعناعي', colors: ['#051a10','#0a2a1a','#051508','#000a05'] },
-        { name: 'مرجاني', colors: ['#1a0a0a','#2a1510','#150808','#0a0505'] },
-        { name: 'نيلي', colors: ['#050515','#0a0a25','#050518','#000010'] },
-        { name: 'ذهبي وردي', colors: ['#1a0a10','#2a1518','#150a0e','#0a0508'] },
-        { name: 'فضي', colors: ['#0a0a0a','#1a1a1a','#101010','#050505'] },
-        { name: 'كستنائي', colors: ['#150505','#250a08','#100505','#080000'] },
-        { name: 'تركواز', colors: ['#051515','#0a2020','#081515','#051010'] },
-        { name: 'بني', colors: ['#150a05','#201008','#100805','#080500'] }
+        // خلفيات عادية (10)
+        { name: 'ذهبي كلاسيك', colors: ['#0a0505','#1a0a05','#0a0510','#000000'], type: 'gradient' },
+        { name: 'أزرق ليلي', colors: ['#050a15','#0a1530','#051020','#000510'], type: 'gradient' },
+        { name: 'أخضر زمردي', colors: ['#050a08','#0a1a10','#051008','#000a05'], type: 'gradient' },
+        { name: 'بنفسجي ملكي', colors: ['#0a0515','#150a25','#0a0510','#05000a'], type: 'gradient' },
+        { name: 'أحمر غامق', colors: ['#150505','#250a0a','#100505','#0a0000'], type: 'gradient' },
+        { name: 'وردي ناعم', colors: ['#1a0a15','#2a1520','#150a10','#0a0508'], type: 'gradient' },
+        { name: 'كحلي أنيق', colors: ['#050a15','#0a1025','#050810','#00050a'], type: 'gradient' },
+        { name: 'نحاسي دافئ', colors: ['#150a05','#251510','#100a05','#0a0500'], type: 'gradient' },
+        { name: 'رمادي دخاني', colors: ['#0a0a0a','#151515','#0a0a0a','#050505'], type: 'gradient' },
+        { name: 'تركواز', colors: ['#051015','#0a2025','#051518','#000a0e'], type: 'gradient' },
+        // خلفيات مخططة (10)
+        { name: 'مخطط ذهبي', colors: ['#0a0505','#d4a843'], type: 'stripes', stripeWidth: 40 },
+        { name: 'مخطط أزرق', colors: ['#050a15','#1a3a6a'], type: 'stripes', stripeWidth: 30 },
+        { name: 'مخطط أخضر', colors: ['#050a08','#1a4a2a'], type: 'stripes', stripeWidth: 35 },
+        { name: 'مخطط بنفسجي', colors: ['#0a0515','#3a1a5a'], type: 'stripes', stripeWidth: 45 },
+        { name: 'مخطط أحمر', colors: ['#150505','#5a1a1a'], type: 'stripes', stripeWidth: 25 },
+        { name: 'مخطط وردي', colors: ['#1a0a15','#5a2a3a'], type: 'stripes', stripeWidth: 50 },
+        { name: 'مخطط كحلي', colors: ['#050a15','#2a3a5a'], type: 'stripes', stripeWidth: 30 },
+        { name: 'مخطط نحاسي', colors: ['#150a05','#5a3a1a'], type: 'stripes', stripeWidth: 40 },
+        { name: 'مخطط رمادي', colors: ['#0a0a0a','#3a3a3a'], type: 'stripes', stripeWidth: 35 },
+        { name: 'مخطط تركواز', colors: ['#051015','#1a4a4a'], type: 'stripes', stripeWidth: 45 },
+        // خلفيات منقطة (10)
+        { name: 'منقط ذهبي', colors: ['#0a0505','#d4a843'], type: 'dots', dotSize: 8, dotSpacing: 40 },
+        { name: 'منقط أزرق', colors: ['#050a15','#1a3a6a'], type: 'dots', dotSize: 6, dotSpacing: 35 },
+        { name: 'منقط أخضر', colors: ['#050a08','#1a4a2a'], type: 'dots', dotSize: 10, dotSpacing: 50 },
+        { name: 'منقط بنفسجي', colors: ['#0a0515','#3a1a5a'], type: 'dots', dotSize: 7, dotSpacing: 30 },
+        { name: 'منقط أحمر', colors: ['#150505','#5a1a1a'], type: 'dots', dotSize: 9, dotSpacing: 45 },
+        { name: 'منقط وردي', colors: ['#1a0a15','#5a2a3a'], type: 'dots', dotSize: 5, dotSpacing: 25 },
+        { name: 'منقط كحلي', colors: ['#050a15','#2a3a5a'], type: 'dots', dotSize: 8, dotSpacing: 40 },
+        { name: 'منقط نحاسي', colors: ['#150a05','#5a3a1a'], type: 'dots', dotSize: 6, dotSpacing: 35 },
+        { name: 'منقط رمادي', colors: ['#0a0a0a','#3a3a3a'], type: 'dots', dotSize: 7, dotSpacing: 30 },
+        { name: 'منقط تركواز', colors: ['#051015','#1a4a4a'], type: 'dots', dotSize: 10, dotSpacing: 50 },
+        // خلفيات هندسية ونجوم (10)
+        { name: 'هندسي ذهبي', colors: ['#0a0505','#d4a843'], type: 'geometric', shape: 'hexagon' },
+        { name: 'هندسي أزرق', colors: ['#050a15','#1a3a6a'], type: 'geometric', shape: 'triangle' },
+        { name: 'هندسي أخضر', colors: ['#050a08','#1a4a2a'], type: 'geometric', shape: 'diamond' },
+        { name: 'هندسي بنفسجي', colors: ['#0a0515','#3a1a5a'], type: 'geometric', shape: 'circle' },
+        { name: 'هندسي أحمر', colors: ['#150505','#5a1a1a'], type: 'geometric', shape: 'square' },
+        { name: 'نجوم ذهبية', colors: ['#0a0505','#d4a843'], type: 'stars', starCount: 50 },
+        { name: 'نجوم زرقاء', colors: ['#050a15','#1a3a6a'], type: 'stars', starCount: 60 },
+        { name: 'نجوم خضراء', colors: ['#050a08','#1a4a2a'], type: 'stars', starCount: 40 },
+        { name: 'نجوم بنفسجية', colors: ['#0a0515','#3a1a5a'], type: 'stars', starCount: 55 },
+        { name: 'نجوم حمراء', colors: ['#150505','#5a1a1a'], type: 'stars', starCount: 45 }
     ];
     
     function init() {
@@ -40,6 +78,7 @@
         }
         
         initParticles();
+        initSizeGrid();
         initBgGrid();
         
         document.getElementById('shuffleBtn').addEventListener('click', shuffleQuote);
@@ -72,12 +111,30 @@
         });
         
         var touchStartX = 0, touchEndX = 0;
-        document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+        document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches<span class="footnote-wrapper">[0](0)</span>.screenX; }, {passive: true});
         document.addEventListener('touchend', function(e) {
-            touchEndX = e.changedTouches[0].screenX;
+            touchEndX = e.changedTouches<span class="footnote-wrapper">[0](0)</span>.screenX;
             var diff = touchStartX - touchEndX;
             if (Math.abs(diff) > 50) { if (diff > 0) nextQuote(); else prevQuote(); }
         }, {passive: true});
+    }
+    
+    function initSizeGrid() {
+        var grid = document.getElementById('sizeGrid');
+        grid.innerHTML = '';
+        for (var i = 0; i < sizes.length; i++) {
+            (function(idx) {
+                var div = document.createElement('div');
+                div.className = 'size-item' + (idx === selectedSize ? ' selected' : '');
+                div.innerHTML = '<div class="size-icon">' + sizes[idx].icon + '</div><div class="size-name">' + sizes[idx].name + '</div><div class="size-dims">' + sizes[idx].dims + '</div>';
+                div.addEventListener('click', function() {
+                    document.querySelectorAll('.size-item').forEach(function(el) { el.classList.remove('selected'); });
+                    div.classList.add('selected');
+                    selectedSize = idx;
+                });
+                grid.appendChild(div);
+            })(i);
+        }
     }
     
     function initBgGrid() {
@@ -87,7 +144,20 @@
             (function(idx) {
                 var div = document.createElement('div');
                 div.className = 'bg-grid-item' + (idx === selectedBg ? ' selected' : '');
-                div.innerHTML = '<div class="preview" style="background: linear-gradient(135deg, ' + backgrounds[idx].colors.join(',') + ');"></div><div class="name">' + backgrounds[idx].name + '</div>';
+                var previewStyle = '';
+                var bg = backgrounds[idx];
+                if (bg.type === 'gradient') {
+                    previewStyle = 'background: linear-gradient(135deg, ' + bg.colors.join(',') + ');';
+                } else if (bg.type === 'stripes') {
+                    previewStyle = 'background: repeating-linear-gradient(45deg, ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ ' 0px, ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ ' ' + bg.stripeWidth + 'px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ' ' + bg.stripeWidth + 'px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ' ' + (bg.stripeWidth*2) + 'px);';
+                } else if (bg.type === 'dots') {
+                    previewStyle = 'background: ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ '; background-image: radial-gradient(' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ' ' + bg.dotSize + 'px, transparent ' + bg.dotSize + 'px); background-size: ' + bg.dotSpacing + 'px ' + bg.dotSpacing + 'px;';
+                } else if (bg.type === 'geometric') {
+                    previewStyle = 'background: ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ '; background-image: repeating-conic-gradient(' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ' 0% 25%, transparent 0% 50%); background-size: 20px 20px;';
+                } else if (bg.type === 'stars') {
+                    previewStyle = 'background: ' + bg.colors<span class="footnote-wrapper">[0](0) </span>+ '; background-image: radial-gradient(2px 2px at 20px 30px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ', transparent), radial-gradient(2px 2px at 40px 70px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ', transparent), radial-gradient(2px 2px at 50px 160px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ', transparent), radial-gradient(2px 2px at 90px 40px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ', transparent), radial-gradient(2px 2px at 130px 80px, ' + bg.colors<span class="footnote-wrapper">[1](1) </span>+ ', transparent); background-size: 200px 200px;';
+                }
+                div.innerHTML = '<div class="preview" style="' + previewStyle + '"></div><div class="name">' + bg.name + '</div>';
                 div.addEventListener('click', function() {
                     document.querySelectorAll('.bg-grid-item').forEach(function(el) { el.classList.remove('selected'); });
                     div.classList.add('selected');
@@ -292,87 +362,224 @@
         
         var canvas = document.getElementById('imageCanvas');
         var ctx = canvas.getContext('2d');
-        canvas.width = 2160; canvas.height = 3840;
+        var size = sizes[selectedSize];
+        canvas.width = size.w;
+        canvas.height = size.h;
         
         var bg = backgrounds[selectedBg];
-        var grad = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
-        grad.addColorStop(0, bg.colors[0]);
-        grad.addColorStop(0.3, bg.colors[1]);
-        grad.addColorStop(0.6, bg.colors[2]);
-        grad.addColorStop(1, bg.colors[3]);
-        ctx.fillStyle = grad; ctx.fillRect(0,0,canvas.width,canvas.height);
         
-        for (var i=0;i<8;i++) {
-            var x=Math.random()*canvas.width, y=Math.random()*canvas.height, r=100+Math.random()*300;
+        // رسم الخلفية حسب النوع
+        if (bg.type === 'gradient') {
+            var grad = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+            grad.addColorStop(0, bg.colors<span class="footnote-wrapper">[0](0)</span>);
+            grad.addColorStop(0.3, bg.colors<span class="footnote-wrapper">[1](1)</span>);
+            grad.addColorStop(0.6, bg.colors<span class="footnote-wrapper">[2](2)</span>);
+            grad.addColorStop(1, bg.colors<span class="footnote-wrapper">[3](3)</span>);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+        } else if (bg.type === 'stripes') {
+            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[0](0)</span>;
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+            var sw = bg.stripeWidth * (canvas.width / 1080);
+            for (var x = 0; x < canvas.width + canvas.height; x += sw * 2) {
+                ctx.save();
+                ctx.translate(x, 0);
+                ctx.rotate(45 * Math.PI / 180);
+                ctx.fillStyle = bg.colors<span class="footnote-wrapper">[1](1)</span>;
+                ctx.fillRect(0, -canvas.height, sw, canvas.height * 3);
+                ctx.restore();
+            }
+        } else if (bg.type === 'dots') {
+            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[0](0)</span>;
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+            var ds = bg.dotSize * (canvas.width / 1080);
+            var dsp = bg.dotSpacing * (canvas.width / 1080);
+            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[1](1)</span>;
+            for (var dx = 0; dx < canvas.width; dx += dsp) {
+                for (var dy = 0; dy < canvas.height; dy += dsp) {
+                    ctx.beginPath();
+                    ctx.arc(dx, dy, ds, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        } else if (bg.type === 'geometric') {
+            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[0](0)</span>;
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.strokeStyle = bg.colors<span class="footnote-wrapper">[1](1)</span>;
+            ctx.lineWidth = 2;
+            var gs = 40 * (canvas.width / 1080);
+            for (var gx = 0; gx < canvas.width + gs; gx += gs) {
+                for (var gy = 0; gy < canvas.height + gs; gy += gs) {
+                    if (bg.shape === 'hexagon') {
+                        ctx.beginPath();
+                        for (var hi = 0; hi < 6; hi++) {
+                            var ha = hi * Math.PI / 3 - Math.PI / 6;
+                            var hx = gx + gs/2 + gs/2 * Math.cos(ha);
+                            var hy = gy + gs/2 + gs/2 * Math.sin(ha);
+                            if (hi === 0) ctx.moveTo(hx, hy);
+                            else ctx.lineTo(hx, hy);
+                        }
+                        ctx.closePath();
+                        ctx.stroke();
+                    } else if (bg.shape === 'triangle') {
+                        ctx.beginPath();
+                        ctx.moveTo(gx + gs/2, gy);
+                        ctx.lineTo(gx + gs, gy + gs);
+                        ctx.lineTo(gx, gy + gs);
+                        ctx.closePath();
+                        ctx.stroke();
+                    } else if (bg.shape === 'diamond') {
+                        ctx.beginPath();
+                        ctx.moveTo(gx + gs/2, gy);
+                        ctx.lineTo(gx + gs, gy + gs/2);
+                        ctx.lineTo(gx + gs/2, gy + gs);
+                        ctx.lineTo(gx, gy + gs/2);
+                        ctx.closePath();
+                        ctx.stroke();
+                    } else if (bg.shape === 'circle') {
+                        ctx.beginPath();
+                        ctx.arc(gx + gs/2, gy + gs/2, gs/3, 0, Math.PI * 2);
+                        ctx.stroke();
+                    } else if (bg.shape === 'square') {
+                        ctx.strokeRect(gx + gs/6, gy + gs/6, gs * 2/3, gs * 2/3);
+                    }
+                }
+            }
+        } else if (bg.type === 'stars') {
+            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[0](0)</span>;
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = bg.colors<span class="footnote-wrapper">[1](1)</span>;
+            for (var si = 0; si < bg.starCount; si++) {
+                var sx = Math.random() * canvas.width;
+                var sy = Math.random() * canvas.height;
+                var sr = Math.random() * 3 + 1;
+                ctx.beginPath();
+                ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // إضافة تأثيرات ضوئية
+        for (var i=0;i<6;i++) {
+            var x=Math.random()*canvas.width, y=Math.random()*canvas.height, r=Math.min(canvas.width,canvas.height)*0.15;
             var cg=ctx.createRadialGradient(x,y,0,x,y,r);
-            cg.addColorStop(0,'rgba(212,168,67,0.03)'); cg.addColorStop(1,'rgba(212,168,67,0)');
+            cg.addColorStop(0,'rgba(212,168,67,0.04)'); cg.addColorStop(1,'rgba(212,168,67,0)');
             ctx.fillStyle=cg; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
         }
         
-        ctx.strokeStyle='rgba(212,168,67,0.1)'; ctx.lineWidth=3; ctx.strokeRect(100,100,canvas.width-200,canvas.height-200);
-        ctx.strokeStyle='rgba(212,168,67,0.05)'; ctx.lineWidth=1; ctx.strokeRect(140,140,canvas.width-280,canvas.height-280);
+        // إطار زخرفي
+        var margin = Math.min(canvas.width, canvas.height) * 0.05;
+        ctx.strokeStyle='rgba(212,168,67,0.12)'; ctx.lineWidth=3; ctx.strokeRect(margin,margin,canvas.width-margin*2,canvas.height-margin*2);
+        ctx.strokeStyle='rgba(212,168,67,0.06)'; ctx.lineWidth=1; ctx.strokeRect(margin*1.5,margin*1.5,canvas.width-margin*3,canvas.height-margin*3);
         
+        // عنوان
+        var titleSize = Math.min(canvas.width, canvas.height) * 0.035;
         ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=20;
         ctx.fillStyle='rgba(212,168,67,0.5)'; ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.font='55px "Amiri", serif'; ctx.fillText('قال الإمام علي (عليه السلام)',canvas.width/2,350);
+        ctx.font=titleSize+'px "Amiri", serif';
+        ctx.fillText('قال الإمام علي (عليه السلام)',canvas.width/2,canvas.height * 0.1);
         
-        var cx=200, cy=600, cw=canvas.width-400, ch=canvas.height-1300;
-        ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=80; ctx.shadowOffsetX=0; ctx.shadowOffsetY=15;
-        ctx.fillStyle='rgba(255,255,255,0.04)'; roundRect(ctx,cx,cy,cw,ch,50); ctx.fill();
-        ctx.shadowColor='transparent'; ctx.strokeStyle='rgba(212,168,67,0.1)'; ctx.lineWidth=2; roundRect(ctx,cx,cy,cw,ch,50); ctx.stroke();
+        // خلفية النص
+        var textMarginX = canvas.width * 0.1;
+        var textMarginY = canvas.height * 0.18;
+        var textWidth = canvas.width - textMarginX * 2;
+        var textHeight = canvas.height * 0.6;
+        ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=60; ctx.shadowOffsetX=0; ctx.shadowOffsetY=10;
+        ctx.fillStyle='rgba(255,255,255,0.04)';
+        roundRect(ctx, textMarginX, textMarginY, textWidth, textHeight, Math.min(canvas.width,canvas.height)*0.03);
+        ctx.fill();
+        ctx.shadowColor='transparent'; ctx.strokeStyle='rgba(212,168,67,0.1)'; ctx.lineWidth=2;
+        roundRect(ctx, textMarginX, textMarginY, textWidth, textHeight, Math.min(canvas.width,canvas.height)*0.03);
+        ctx.stroke();
         
+        // النص
         ctx.shadowColor='rgba(0,0,0,0.4)'; ctx.shadowBlur=25;
         ctx.fillStyle='#f5f0e8'; ctx.textAlign='center'; ctx.textBaseline='middle';
         
-        var mw=cw-120, tl=quote.text.length, bfs=tl<=30?85:tl<=50?70:tl<=80?55:tl<=120?45:38;
+        var maxTextWidth = textWidth - canvas.width * 0.06;
+        var tl = quote.text.length;
+        var bfs;
+        if (size.name === 'ملصق شفاف') bfs = Math.min(canvas.width, canvas.height) * 0.08;
+        else if (tl <= 30) bfs = Math.min(canvas.width, canvas.height) * 0.06;
+        else if (tl <= 50) bfs = Math.min(canvas.width, canvas.height) * 0.05;
+        else if (tl <= 80) bfs = Math.min(canvas.width, canvas.height) * 0.04;
+        else if (tl <= 120) bfs = Math.min(canvas.width, canvas.height) * 0.035;
+        else bfs = Math.min(canvas.width, canvas.height) * 0.03;
+        
         ctx.font=bfs+'px "Amiri", serif';
         
         var words=quote.text.split(' '), lines=[], cl='';
         for (var w=0;w<words.length;w++) {
             var tl2=cl+' '+words[w], m=ctx.measureText(tl2);
-            if (m.width>mw&&cl!==''){lines.push(cl);cl=words[w];}else{cl=tl2;}
+            if (m.width>maxTextWidth&&cl!==''){lines.push(cl);cl=words[w];}else{cl=tl2;}
         }
         lines.push(cl);
         
-        var lh=bfs*1.8, sy=cy+ch/2-(lines.length-1)*lh/2;
-        ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=35;
+        var lh=bfs*1.8;
+        var startY = textMarginY + textHeight/2 - (lines.length-1)*lh/2;
+        ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=30;
         
-        for (var l=0;l<lines.length;l++) {
-            var lineText = lines[l].trim();
-            var lineWidth = ctx.measureText(lineText).width;
-            
-            ctx.fillStyle='rgba(212,168,67,0.25)'; ctx.font=(bfs*0.8)+'px "Amiri", serif';
-            ctx.textAlign='right'; ctx.fillText('\uFD3F', canvas.width/2 + lineWidth/2 + 20, sy+l*lh);
-            ctx.textAlign='left'; ctx.fillText('\uFD3E', canvas.width/2 - lineWidth/2 - 20, sy+l*lh);
-            
-            ctx.fillStyle='#f5f0e8'; ctx.font=bfs+'px "Amiri", serif';
-            ctx.textAlign='center'; ctx.fillText(lineText, canvas.width/2, sy+l*lh);
+     for (var l = 0; l < lines.length; l++) {
+    ctx.fillText(lines[l], canvas.width / 2, startY + l * lh);
+}
+
+        for (var l = 0; l < lines.length; l++) {
+            ctx.fillText(lines[l], canvas.width / 2, startY + l * lh);
         }
         
-        ctx.shadowBlur=15; ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='30px "Amiri", serif';
-        ctx.textAlign='center'; ctx.fillText('\u2014 \u0633\u064A\u0641 \u0639\u0644\u064A \u2014',canvas.width/2,canvas.height-180);
-        ctx.fillStyle='rgba(212,168,67,0.25)'; ctx.font='26px "Cairo", sans-serif';
-        ctx.fillText('@ne_7u',canvas.width/2,canvas.height-120);
+        // توقيع
+        var signSize = Math.min(canvas.width, canvas.height) * 0.025;
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = 'rgba(212,168,67,0.4)';
+        ctx.font = signSize + 'px "Amiri", serif';
+        ctx.fillText('— موقع أقوال الإمام علي (عليه السلام)', canvas.width / 2, canvas.height * 0.88);
         
-        var link=document.createElement('a');
-        link.download='قول_الإمام_علي_'+(currentIndex+1)+'.png';
-        link.href=canvas.toDataURL('image/png'); link.click();
-        showToast('تم حفظ الصورة بدقة عالية');
+        // تحويل اللوحة إلى صورة وتحميلها
+        var link = document.createElement('a');
+        link.download = 'imam-ali-quote-' + (currentIndex + 1) + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        showToast('تم تحميل الصورة بنجاح');
     }
     
-    function roundRect(ctx,x,y,w,h,r) {
-        if(w<2*r)r=w/2; if(h<2*r)r=h/2;
-        ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
-        ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
-        ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
-        ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);
-        ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+    // دالة مساعدة لرسم مستطيل بزوايا دائرية
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
     }
     
-    function showToast(msg) {
-        var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-        setTimeout(function(){t.classList.remove('show');},3000);
+    // دالة عرض الإشعارات (Toast)
+    function showToast(message) {
+        var toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:#f5f0e8;padding:12px 24px;border-radius:8px;font-family:"Amiri",serif;font-size:1.1em;z-index:10000;opacity:0;transition:opacity 0.3s ease;pointer-events:none;border:1px solid rgba(212,168,67,0.3);';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.style.opacity = '1';
+        setTimeout(function() {
+            toast.style.opacity = '0';
+        }, 2000);
     }
     
-    if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+    // تشغيل التطبيق عند تحميل الصفحة
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+    
 })();
