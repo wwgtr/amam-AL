@@ -3,6 +3,7 @@
     
     var currentIndex = 0;
     var quotes = [];
+    var fontSizeMultiplier = 1;
     
     function init() {
         if (typeof quotesData !== 'undefined' && quotesData.length > 0) {
@@ -20,9 +21,14 @@
         document.getElementById('saveBtn').addEventListener('click', saveAsImage);
         document.getElementById('allQuotesBtn').addEventListener('click', openAllQuotes);
         document.getElementById('aboutBtn').addEventListener('click', openAbout);
+        document.getElementById('settingsBtn').addEventListener('click', openSettings);
         document.getElementById('closeAllQuotes').addEventListener('click', closeAllQuotes);
         document.getElementById('closeAbout').addEventListener('click', closeAbout);
+        document.getElementById('closeSettings').addEventListener('click', closeSettings);
         document.getElementById('searchInput').addEventListener('input', searchQuotes);
+        document.getElementById('fontSizeSelect').addEventListener('change', changeFontSize);
+        document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+        document.getElementById('minimalModeToggle').addEventListener('click', toggleMinimalMode);
         
         window.addEventListener('click', function(e) {
             if (e.target.classList.contains('modal')) e.target.classList.remove('active');
@@ -118,8 +124,45 @@
         var quote = quotes[currentIndex];
         var el = document.getElementById('quoteContent');
         el.textContent = quote.text;
-        var len = quote.text.length;
-        el.style.fontSize = (len<=30?2.0:len<=50?1.6:len<=80?1.3:len<=120?1.1:0.95)+'em';
+        updateFontSize(quote.text.length);
+    }
+    
+    function updateFontSize(textLength) {
+        var el = document.getElementById('quoteContent');
+        var baseSize;
+        if (textLength <= 30) baseSize = 2.0;
+        else if (textLength <= 50) baseSize = 1.6;
+        else if (textLength <= 80) baseSize = 1.3;
+        else if (textLength <= 120) baseSize = 1.1;
+        else baseSize = 0.95;
+        el.style.fontSize = (baseSize * fontSizeMultiplier) + 'em';
+    }
+    
+    function changeFontSize() {
+        var val = document.getElementById('fontSizeSelect').value;
+        if (val === 'small') fontSizeMultiplier = 0.8;
+        else if (val === 'medium') fontSizeMultiplier = 1;
+        else if (val === 'large') fontSizeMultiplier = 1.3;
+        else if (val === 'xlarge') fontSizeMultiplier = 1.6;
+        var quote = quotes[currentIndex];
+        if (quote) updateFontSize(quote.text.length);
+        showToast('تم تغيير حجم الخط');
+    }
+    
+    function toggleDarkMode() {
+        var container = document.getElementById('mainContainer');
+        var track = document.getElementById('darkModeTrack');
+        container.classList.toggle('dark-mode');
+        track.classList.toggle('active');
+        showToast(container.classList.contains('dark-mode') ? 'تم تفعيل الوضع الداكن' : 'تم إلغاء الوضع الداكن');
+    }
+    
+    function toggleMinimalMode() {
+        var container = document.getElementById('mainContainer');
+        var track = document.getElementById('minimalModeTrack');
+        container.classList.toggle('minimal-mode');
+        track.classList.toggle('active');
+        showToast(container.classList.contains('minimal-mode') ? 'تم إخفاء العناصر' : 'تم إظهار العناصر');
     }
     
     function shuffleQuote() { showQuote(Math.floor(Math.random()*quotes.length)); showToast('تم اختيار قول عشوائي'); }
@@ -129,6 +172,8 @@
     function closeAllQuotes() { document.getElementById('allQuotesModal').classList.remove('active'); }
     function openAbout() { document.getElementById('aboutModal').classList.add('active'); }
     function closeAbout() { document.getElementById('aboutModal').classList.remove('active'); }
+    function openSettings() { document.getElementById('settingsModal').classList.add('active'); }
+    function closeSettings() { document.getElementById('settingsModal').classList.remove('active'); }
     
     function displayAllQuotes(arr) {
         var list = document.getElementById('quotesList');
@@ -137,7 +182,7 @@
             (function(idx){
                 var item = document.createElement('div');
                 item.className = 'quote-item';
-                item.innerHTML = '<div class="q-text">'+arr[idx].text+'</div>';
+                item.innerHTML = '<div class="q-text">'+arr[idx].text+'</div><div class="q-number">#'+(idx+1)+'</div>';
                 item.addEventListener('click',function(){ showQuote(idx); closeAllQuotes(); });
                 list.appendChild(item);
             })(i);
@@ -146,9 +191,14 @@
     
     function searchQuotes() {
         var term = this.value.toLowerCase();
+        // إزالة الحركات للبحث
+        var termClean = term.replace(/[ًٌٍَُِّْ]/g, '');
         var filtered = [];
         for (var i=0;i<quotes.length;i++) {
-            if (quotes[i].text.toLowerCase().includes(term)) filtered.push(quotes[i]);
+            var textClean = quotes[i].text.replace(/[ًٌٍَُِّْ]/g, '');
+            if (textClean.toLowerCase().includes(termClean) || quotes[i].text.toLowerCase().includes(term)) {
+                filtered.push(quotes[i]);
+            }
         }
         displayAllQuotes(filtered);
     }
